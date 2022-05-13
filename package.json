@@ -1,13 +1,13 @@
 {
-    "name": "com.hsoar.unity-arduino",
-    "version": "0.1.0",
-    "displayName": "Unity Arduino",
-    "description": "A barebones package designed to interface arduino based devices with unity.",
-    "unity": "2020.3",
-    "unityRelease": "25f1",
-    "author": {
-      "name": "Harry Soar",
-      "email": "hsoar96@gmail.com"
-    }
-  }
-  
+  "name": "com.hsoar.unity-arduino",
+  "version": "0.1.0",
+  "displayName": "Unity Arduino",
+  "description": "A barebones package designed to interface arduino based devices with unity.",
+  "unity": "2020.3",
+  "unityRelease": "25f1",
+  "author": {
+    "name": "Harry Soar",
+    "email": "hsoar96@gmail.com"
+  },
+  "type": "library"
+}

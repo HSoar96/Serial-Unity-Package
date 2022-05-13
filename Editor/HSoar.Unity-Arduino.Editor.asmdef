@@ -1,6 +1,11 @@
 {
-    "name": "HSoar.UnityArduino",
-    "references": [],
+	"name": "HSoar.Unity-Arduino.Editor",
+	"references": [
+        "HSoar.Unity-Arduino.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
