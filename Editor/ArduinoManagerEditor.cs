@@ -17,6 +17,24 @@ public class ArduinoManagerEditor : Editor
         SetAPILevel();
     }
 
+    /// <summary>
+    /// Sets global define to avoid calls to System.IO.Ports, 
+    /// when API level is not set correctly.
+    /// </summary>
+    private void SetGlobalDefine(string define)
+    {
+        string currentDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+
+        if (currentDefines.Contains(define))
+        {
+            Debug.LogWarning($"<b>{define}</b> Already exists in scripting defines for group <b>{buildTargetGroup}</b>");
+            return;
+        }
+
+        // Defines are seperated by a ; in unity so add ;define onto the
+        // string of current defines to add a new one.
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, currentDefines + ";" + define);
+    }
 
     /// <summary>
     /// Creates UI elements that check API level 
@@ -27,6 +45,9 @@ public class ArduinoManagerEditor : Editor
         // Check if the current project has the correct build settings.
         // If it does tell the user everything is fine,
         // else provide a prompt and a button to alert them.
+
+        // Could use #if UNITY_ARDUINO_API_SET here but this will be easier
+        // to read down the line and performance doesnt matter to much in editor scripts.
         if (PlayerSettings.GetApiCompatibilityLevel(buildTargetGroup) != ApiCompatibilityLevel.NET_4_6)
         {
             // TODO: Work out a neater way to produce 
@@ -43,6 +64,7 @@ public class ArduinoManagerEditor : Editor
                 // Directly changes the users API level in their project settings,
                 // because using anything other than .NET 4.X will not allow the use of System.IO.Ports
                 PlayerSettings.SetApiCompatibilityLevel(buildTargetGroup, ApiCompatibilityLevel.NET_4_6);
+                SetGlobalDefine("UNITY_ARDUINO_API_SET");
             }
             GUILayout.EndVertical();
         }
