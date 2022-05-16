@@ -24,6 +24,7 @@ public class ArduinoManagerEditor : Editor
         #endif
     }
 
+#if UNITY_ARDUINO_API_SET
     //DEBUG: Remove after Testing;
     private void BeginSerialCommunication()
     {
@@ -35,6 +36,7 @@ public class ArduinoManagerEditor : Editor
         }
         GUILayout.EndVertical();
     }
+#endif
 
 
     /// <summary>
