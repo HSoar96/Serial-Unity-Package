@@ -5,6 +5,7 @@ using UnityEditor;
 public class ArduinoManagerEditor : Editor
 {
     private BuildTargetGroup buildTargetGroup;
+    private ArduinoManager arduinoManager;
 
     public override void OnInspectorGUI()
     {   
@@ -12,29 +13,29 @@ public class ArduinoManagerEditor : Editor
         // however no unity method exists at the moment to replace it.
         // TODO: Make a new method that uses NamedBuildTarget.
         buildTargetGroup = BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget);
+        arduinoManager = target as ArduinoManager;
 
         base.OnInspectorGUI();
+
         SetAPILevel();
+
+        #if UNITY_ARDUINO_API_SET
+        BeginSerialCommunication();
+        #endif
     }
 
-    /// <summary>
-    /// Sets global define to avoid calls to System.IO.Ports, 
-    /// when API level is not set correctly.
-    /// </summary>
-    private void SetGlobalDefine(string define)
+    //DEBUG: Remove after Testing;
+    private void BeginSerialCommunication()
     {
-        string currentDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
-
-        if (currentDefines.Contains(define))
+        GUILayout.BeginVertical();
+        GUI.backgroundColor = HexToColour("#0078FF");
+        if(GUILayout.Button("Begin Serial Communication"))
         {
-            Debug.LogWarning($"<b>{define}</b> Already exists in scripting defines for group <b>{buildTargetGroup}</b>");
-            return;
+            arduinoManager.BeginSerialCommuniation("16C0", "0483");
         }
-
-        // Defines are seperated by a ; in unity so add ;define onto the
-        // string of current defines to add a new one.
-        PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, currentDefines + ";" + define);
+        GUILayout.EndVertical();
     }
+
 
     /// <summary>
     /// Creates UI elements that check API level 
@@ -82,12 +83,35 @@ public class ArduinoManagerEditor : Editor
     }
 
     /// <summary>
+    /// Sets global define to avoid calls to System.IO.Ports, 
+    /// when API level is not set correctly.
+    /// </summary>
+    private void SetGlobalDefine(string define)
+    {
+        string currentDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildTargetGroup);
+
+        if (currentDefines.Contains(define))
+        {
+            Debug.LogWarning($"<b>{define}</b> Already exists in scripting defines for group <b>{buildTargetGroup}</b>");
+            return;
+        }
+
+        // Defines are seperated by a ; in unity so add ;define onto the
+        // string of current defines to add a new one.
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, currentDefines + ";" + define);
+    }
+
+    /// <summary>
     /// Trys to parse a hex value into a unity Color and returns it.
     /// </summary>
     /// <param name="hex">Hex string to parse</param>
     /// <returns>A <c>Unity Color</c> that corrosponds to parsed Hex</returns>
     private Color HexToColour(string hex)
     {
+        if (!hex.Contains("#"))
+        {
+            hex = "#" + hex;
+        }
         Color color = new Color();
         ColorUtility.TryParseHtmlString(hex, out color);
         return color;
