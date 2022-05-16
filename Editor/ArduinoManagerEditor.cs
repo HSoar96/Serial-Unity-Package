@@ -4,12 +4,19 @@ using UnityEditor;
 [CustomEditor(typeof(ArduinoManager))]
 public class ArduinoManagerEditor : Editor
 {
+    private BuildTargetGroup buildTargetGroup;
 
     public override void OnInspectorGUI()
-    {
+    {   
+        // Build target group is being depreceated
+        // however no unity method exists at the moment to replace it.
+        // TODO: Make a new method that uses NamedBuildTarget.
+        buildTargetGroup = BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget);
+
         base.OnInspectorGUI();
         SetAPILevel();
     }
+
 
     /// <summary>
     /// Creates UI elements that check API level 
@@ -17,15 +24,10 @@ public class ArduinoManagerEditor : Editor
     /// </summary>
     private void SetAPILevel()
     {
-        // Build target group is being depreceated
-        // however no unity method exists at the moment to replace it.
-        var target = EditorUserBuildSettings.activeBuildTarget;
-        var group = BuildPipeline.GetBuildTargetGroup(target);
-
         // Check if the current project has the correct build settings.
         // If it does tell the user everything is fine,
         // else provide a prompt and a button to alert them.
-        if (PlayerSettings.GetApiCompatibilityLevel(group) != ApiCompatibilityLevel.NET_4_6)
+        if (PlayerSettings.GetApiCompatibilityLevel(buildTargetGroup) != ApiCompatibilityLevel.NET_4_6)
         {
             // TODO: Work out a neater way to produce 
             GUILayout.BeginVertical();
@@ -40,7 +42,7 @@ public class ArduinoManagerEditor : Editor
             {
                 // Directly changes the users API level in their project settings,
                 // because using anything other than .NET 4.X will not allow the use of System.IO.Ports
-                PlayerSettings.SetApiCompatibilityLevel(group, ApiCompatibilityLevel.NET_4_6);
+                PlayerSettings.SetApiCompatibilityLevel(buildTargetGroup, ApiCompatibilityLevel.NET_4_6);
             }
             GUILayout.EndVertical();
         }
