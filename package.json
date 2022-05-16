@@ -9,5 +9,11 @@
     "name": "Harry Soar",
     "email": "hsoar96@gmail.com"
   },
-  "type": "library"
+  "samples": [
+    {
+      "displayName": "Arduino Manager Prefab",
+      "description": "Contains a sample Arduino Manager prefab to use in your scenes.",
+      "path": "Samples~/SamplesArduinoManager"
+    }
+  ]
 }
