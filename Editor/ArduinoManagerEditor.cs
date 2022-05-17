@@ -34,6 +34,10 @@ public class ArduinoManagerEditor : Editor
         {
             arduinoManager.BeginSerialCommuniation("2886", "0004");
         }
+        if(GUILayout.Button("List all serial devices"))
+        {
+            arduinoManager.ListAllSerialPorts();
+        }
         GUILayout.EndVertical();
     }
 #endif
