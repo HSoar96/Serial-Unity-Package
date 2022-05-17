@@ -16,8 +16,10 @@ public class ArduinoManager : MonoBehaviour
     private const int DATA_BITS = 8;
     private const int READ_TIMEOUT = 1;
     private SerialPort serialPort = new SerialPort();
-    #endif
+#endif
     #endregion
+    public List<string> friendlyNames;
+    public List<string> comPorts;
 
     #region Serial Communication Methods
 #if UNITY_ARDUINO_API_SET
@@ -33,7 +35,7 @@ public class ArduinoManager : MonoBehaviour
         // It will format the string and initialise a new string list for comports.
         string pattern = string.Format("^VID_{0}.PID_{1}", VID, PID);
         Regex _rx = new Regex(pattern, RegexOptions.IgnoreCase);
-        List<string> comports = new List<string>();
+        List<string> comPorts = new List<string>();
 
         // Get to the base location of the registry where HID data is stored.
         RegistryKey rk1 = Registry.LocalMachine;
@@ -60,13 +62,68 @@ public class ArduinoManager : MonoBehaviour
                         string portName = (string)rk6.GetValue("PortName");
                         // Add to our List.
                         if (!string.IsNullOrEmpty(portName))
-                            comports.Add((string)rk6.GetValue("PortName"));
+                            comPorts.Add((string)rk6.GetValue("PortName"));
                     }
                 }
             }
         }
-        return comports;
+        return comPorts;
     }
+    /// <summary>
+    /// Gets all ports that are stored in the registry, 
+    /// and adds them to a private list of strings.
+    /// </summary>
+    private void ComPortNames()
+    {
+        comPorts = new List<string>();
+        friendlyNames = new List<string>();
+        // Get to the base location of the registry where HID data is stored.
+        RegistryKey rk1 = Registry.LocalMachine;
+        RegistryKey rk2 = rk1.OpenSubKey("SYSTEM\\CurrentControlSet\\Enum");
+        // Serach through each subkey and its subkey and so on.
+        foreach (string s3 in rk2.GetSubKeyNames())
+        {
+            // Search only for USB Serial Devices.
+            if (s3 == "USB")
+            {
+                RegistryKey rk3 = rk2.OpenSubKey(s3);
+                foreach (string s in rk3.GetSubKeyNames())
+                {
+                    RegistryKey rk4 = rk3.OpenSubKey(s);
+                    foreach (string s2 in rk4.GetSubKeyNames())
+                    {
+                        // Here you can get all the data from the devices with those VIDs and PIDs.
+                        RegistryKey rk5 = rk4.OpenSubKey(s2);
+
+                        // Usually along the lines of "USB Serial Device (COMX)"
+                        string friendlyName = (string)rk5.GetValue("FriendlyName");
+
+                        // Open the key where the important data for our use is.
+                        RegistryKey rk6 = rk5.OpenSubKey("Device Parameters");
+                        string portName;
+
+                        // TODO: I dont like this, there must be a cleaner way to do it.
+                        try
+                        {
+                            portName = (string)rk6.GetValue("PortName");
+                        }
+                        catch(Exception e)
+                        {
+                            portName = null;
+                        }
+
+                        // Add to our Lists.
+                        if (!string.IsNullOrEmpty(portName))
+                        {
+                            comPorts.Add((string)rk6.GetValue("PortName"));
+                            friendlyNames.Add(friendlyName);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private SerialPort SetupSerialPort(string portID)
     {
         if (!portID.StartsWith("COM"))
@@ -120,6 +177,15 @@ public class ArduinoManager : MonoBehaviour
         else
         {
             Debug.LogWarning("No ports exist.");
+        }
+    }
+
+    public void ListAllSerialPorts()
+    {
+        ComPortNames();
+        for(int i = 0; i < comPorts.Count; i++)
+        {
+            Debug.Log($"{friendlyNames[i]} @ {comPorts[i]}");
         }
     }
     #endif
