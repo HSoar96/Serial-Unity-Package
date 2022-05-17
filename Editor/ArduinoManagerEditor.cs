@@ -32,7 +32,7 @@ public class ArduinoManagerEditor : Editor
         GUI.backgroundColor = HexToColour("#0078FF");
         if(GUILayout.Button("Begin Serial Communication"))
         {
-            arduinoManager.BeginSerialCommuniation("16C0", "0483");
+            arduinoManager.BeginSerialCommuniation("2886", "0004");
         }
         GUILayout.EndVertical();
     }
@@ -53,7 +53,7 @@ public class ArduinoManagerEditor : Editor
         // to read down the line and performance doesnt matter to much in editor scripts.
         if (PlayerSettings.GetApiCompatibilityLevel(buildTargetGroup) != ApiCompatibilityLevel.NET_4_6)
         {
-            // TODO: Work out a neater way to produce 
+            // TODO: Work out a neater way to produce.
             GUILayout.BeginVertical();
             GUI.backgroundColor = Color.red;
 

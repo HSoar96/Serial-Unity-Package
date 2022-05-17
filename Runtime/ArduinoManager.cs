@@ -29,27 +29,36 @@ public class ArduinoManager : MonoBehaviour
     /// <returns>All COM Ports that have the specified device connected.</returns>
     private List<string> ComPortNames(string VID, string PID)
     {
+        // This is platform dependant and only works on windows.
+        // It will format the string and initialise a new string list for comports.
         string pattern = string.Format("^VID_{0}.PID_{1}", VID, PID);
         Regex _rx = new Regex(pattern, RegexOptions.IgnoreCase);
         List<string> comports = new List<string>();
 
+        // Get to the base location of the registry where HID data is stored.
         RegistryKey rk1 = Registry.LocalMachine;
         RegistryKey rk2 = rk1.OpenSubKey("SYSTEM\\CurrentControlSet\\Enum");
-
+        // Serach through each subkey and its subkey and so on.
         foreach (string s3 in rk2.GetSubKeyNames())
         {
             RegistryKey rk3 = rk2.OpenSubKey(s3);
             foreach (string s in rk3.GetSubKeyNames())
             {
+                // Try and match the VID and PID 
                 if (_rx.Match(s).Success)
                 {
                     RegistryKey rk4 = rk3.OpenSubKey(s);
                     foreach (string s2 in rk4.GetSubKeyNames())
                     {
+                        // Here you can get all the data from the devices with those VIDs and PIDs.
                         RegistryKey rk5 = rk4.OpenSubKey(s2);
+                        // This gives data in the form of "Port_#000X.Hub_#000Y
                         string location = (string)rk5.GetValue("LocationInformation");
+                        // Open the key where the important data for our use is.
                         RegistryKey rk6 = rk5.OpenSubKey("Device Parameters");
+                        // Port name is formatted as "COMX"
                         string portName = (string)rk6.GetValue("PortName");
+                        // Add to our List.
                         if (!string.IsNullOrEmpty(portName))
                             comports.Add((string)rk6.GetValue("PortName"));
                     }
@@ -62,7 +71,7 @@ public class ArduinoManager : MonoBehaviour
     {
         if (!portID.StartsWith("COM"))
             throw new System.Exception("Port ID must begin with COM");
-
+        
         SerialPort port = new SerialPort(portID);
 
         port.BaudRate = BAUD_RATE;
@@ -76,18 +85,11 @@ public class ArduinoManager : MonoBehaviour
     }
     public void BeginSerialCommuniation(string VID, string PID)
     {
-        // Gets a list of COM Ports that have a Teensy 3.6 connected in serial mode.
-        // TODO: Change teensy VID and PID to ensure unique to game.
+        // Gets a list of COM Ports that exist with the specified VID and PID.
         var portNames = ComPortNames(VID, PID);
-
-        if(portNames.Count == 0)
-        {
-            Debug.LogWarning("No ports exist.");
-        }
-
         foreach (var com in portNames)
         {
-            Console.WriteLine($"Teensy 3.6 detected at: {com}");
+            Console.WriteLine($"Device with VID_{VID} and PID_{PID} detected at: {com}");
             Console.WriteLine();
         }
 
@@ -97,6 +99,13 @@ public class ArduinoManager : MonoBehaviour
 
             if (!serialPort.IsOpen)
             {
+                // When a serial device is connected its COM port is saved in the registry.
+                // This will not change unless the registry is cleared, meaning even if the device
+                // is not plugged in it will be there, therefore the program will try and connect
+                // to a currently unplugged board. 
+                //TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
+                // and https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialpinchange (DsrChanged)
+                // to see if this can help determine if a device is currently connected before trying to open communication.
                 try
                 {
                     serialPort.Open();
@@ -107,6 +116,10 @@ public class ArduinoManager : MonoBehaviour
                     Debug.LogException(ex);
                 }
             }
+        }
+        else
+        {
+            Debug.LogWarning("No ports exist.");
         }
     }
     #endif
