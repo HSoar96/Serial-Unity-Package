@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using UnityEngine;
+
+using System.Management;
+using System.Linq;
+
 #if UNITY_ARDUINO_API_SET
 using System.IO.Ports;
 #endif
@@ -18,8 +22,6 @@ public class ArduinoManager : MonoBehaviour
     private SerialPort serialPort = new SerialPort();
 #endif
     #endregion
-    public List<string> friendlyNames;
-    public List<string> comPorts;
 
     #region Serial Communication Methods
 #if UNITY_ARDUINO_API_SET
@@ -29,17 +31,20 @@ public class ArduinoManager : MonoBehaviour
     /// <param name="VID">Vendor ID to look for</param>
     /// <param name="PID">Product ID to look for</param>
     /// <returns>All COM Ports that have the specified device connected.</returns>
-    private List<string> ComPortNames(string VID, string PID)
+    private Dictionary<string, string> ComPortNames(string VID, string PID)
     {
+        // Make a new empty dictionary.
+        var comPorts = new Dictionary<string, string>();
+
         // This is platform dependant and only works on windows.
         // It will format the string and initialise a new string list for comports.
         string pattern = string.Format("^VID_{0}.PID_{1}", VID, PID);
         Regex _rx = new Regex(pattern, RegexOptions.IgnoreCase);
-        List<string> comPorts = new List<string>();
 
         // Get to the base location of the registry where HID data is stored.
         RegistryKey rk1 = Registry.LocalMachine;
         RegistryKey rk2 = rk1.OpenSubKey("SYSTEM\\CurrentControlSet\\Enum");
+
         // Serach through each subkey and its subkey and so on.
         foreach (string s3 in rk2.GetSubKeyNames())
         {
@@ -56,30 +61,40 @@ public class ArduinoManager : MonoBehaviour
                         RegistryKey rk5 = rk4.OpenSubKey(s2);
                         // This gives data in the form of "Port_#000X.Hub_#000Y
                         string location = (string)rk5.GetValue("LocationInformation");
+
+                        // Usually along the lines of "USB Serial Device (COMX)"
+                        string friendlyName = (string)rk5.GetValue("FriendlyName");
+
                         // Open the key where the important data for our use is.
                         RegistryKey rk6 = rk5.OpenSubKey("Device Parameters");
+
                         // Port name is formatted as "COMX"
                         string portName = (string)rk6.GetValue("PortName");
-                        // Add to our List.
+
+                        // Add to our dictionary.
                         if (!string.IsNullOrEmpty(portName))
-                            comPorts.Add((string)rk6.GetValue("PortName"));
+                            comPorts.Add(portName, friendlyName);
                     }
                 }
             }
         }
         return comPorts;
     }
+
     /// <summary>
-    /// Gets all ports that are stored in the registry, 
-    /// and adds them to a private list of strings.
+    /// Gets all USB Serial devices that are stored in the registry, 
+    /// and adds them to a dictionary.
     /// </summary>
-    private void ComPortNames()
+    /// <returns>All USB Com Ports stored in the registry</returns>
+    private Dictionary<string, string> ComPortNames()
     {
-        comPorts = new List<string>();
-        friendlyNames = new List<string>();
+        // Make a new empty dictionary.
+        var comPorts = new Dictionary<string, string>();
+
         // Get to the base location of the registry where HID data is stored.
         RegistryKey rk1 = Registry.LocalMachine;
         RegistryKey rk2 = rk1.OpenSubKey("SYSTEM\\CurrentControlSet\\Enum");
+
         // Serach through each subkey and its subkey and so on.
         foreach (string s3 in rk2.GetSubKeyNames())
         {
@@ -102,7 +117,8 @@ public class ArduinoManager : MonoBehaviour
                         RegistryKey rk6 = rk5.OpenSubKey("Device Parameters");
                         string portName;
 
-                        // TODO: I dont like this, there must be a cleaner way to do it.
+                        // TODO: I dont like this, there must be a cleaner way to do it,
+                        // look into implementing WMI?
                         try
                         {
                             portName = (string)rk6.GetValue("PortName");
@@ -115,13 +131,13 @@ public class ArduinoManager : MonoBehaviour
                         // Add to our Lists.
                         if (!string.IsNullOrEmpty(portName))
                         {
-                            comPorts.Add((string)rk6.GetValue("PortName"));
-                            friendlyNames.Add(friendlyName);
+                            comPorts.Add(portName,friendlyName);
                         }
                     }
                 }
             }
         }
+        return comPorts;
     }
 
     private SerialPort SetupSerialPort(string portID)
@@ -180,14 +196,6 @@ public class ArduinoManager : MonoBehaviour
         }
     }
 
-    public void ListAllSerialPorts()
-    {
-        ComPortNames();
-        for(int i = 0; i < comPorts.Count; i++)
-        {
-            Debug.Log($"{friendlyNames[i]} @ {comPorts[i]}");
-        }
-    }
     #endif
     #endregion
 }
