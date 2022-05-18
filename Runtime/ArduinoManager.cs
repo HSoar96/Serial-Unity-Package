@@ -140,6 +140,38 @@ public class ArduinoManager : MonoBehaviour
         return comPorts;
     }
 
+    /// <summary>
+    /// Gets every USB serial device and then tries to connect logging result and adding to a new dictionary.
+    /// </summary>
+    /// <returns>A dictionary of currently connected devices port name and friendly name</returns>
+    private Dictionary<string, string> CheckIfConnected()
+    {
+        var currentlyConnected = new Dictionary<string, string>();
+
+        foreach(var item in ComPortNames())
+        {
+            SerialPort port = new SerialPort(item.Key);
+            try
+            {
+                // If it opens immediatly close,
+                // log it and add to dictionary.
+                if (!port.IsOpen)
+                {
+                    port.Open();
+                }
+                port.Close();
+
+                Debug.Log($"{item.Value} Is currently plugged in");
+
+                currentlyConnected.Add(item.Key, item.Value);
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        return currentlyConnected;
+    }
     private SerialPort SetupSerialPort(string portID)
     {
         if (!portID.StartsWith("COM"))
