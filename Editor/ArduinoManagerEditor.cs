@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(ArduinoManager))]
 public class ArduinoManagerEditor : Editor
@@ -34,9 +35,16 @@ public class ArduinoManagerEditor : Editor
         {
             arduinoManager.BeginSerialCommuniation("2886", "0004");
         }
-        if(GUILayout.Button("List all serial devices"))
+
+        // Gets connected ports converts them to a list of strings
+        // and shows them in the inspector.
+        if (GUILayout.Button("Get Currently Connected Ports"))
         {
-            arduinoManager.ListAllSerialPorts();
+            var connectedPorts = arduinoManager.CheckIfConnected();
+            foreach(var item in connectedPorts)
+            {
+                Debug.Log(item.Value + " At " + item.Key);
+            }
         }
         GUILayout.EndVertical();
     }

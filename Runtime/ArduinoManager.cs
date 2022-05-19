@@ -144,7 +144,7 @@ public class ArduinoManager : MonoBehaviour
     /// Gets every USB serial device and then tries to connect logging result and adding to a new dictionary.
     /// </summary>
     /// <returns>A dictionary of currently connected devices port name and friendly name</returns>
-    private Dictionary<string, string> CheckIfConnected()
+    public Dictionary<string, string> CheckIfConnected()
     {
         var currentlyConnected = new Dictionary<string, string>();
 
@@ -192,15 +192,15 @@ public class ArduinoManager : MonoBehaviour
     {
         // Gets a list of COM Ports that exist with the specified VID and PID.
         var portNames = ComPortNames(VID, PID);
-        foreach (var com in portNames)
+        foreach (var item in portNames)
         {
-            Console.WriteLine($"Device with VID_{VID} and PID_{PID} detected at: {com}");
+            Console.WriteLine($"Device with VID_{VID} and PID_{PID} detected at: {item.Key}");
             Console.WriteLine();
         }
 
         if (portNames.Count != 0)
         {
-            serialPort = SetupSerialPort(portNames[0]);
+            serialPort = SetupSerialPort(portNames.First().Key);
 
             if (!serialPort.IsOpen)
             {
