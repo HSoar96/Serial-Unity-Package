@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using UnityEngine;
-
-using System.Management;
 using System.Linq;
 
 #if UNITY_ARDUINO_API_SET
 using System.IO.Ports;
+using System.Management;
 #endif
 
 public class ArduinoManager : MonoBehaviour
