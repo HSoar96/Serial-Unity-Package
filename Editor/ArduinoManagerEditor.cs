@@ -41,10 +41,19 @@ public class ArduinoManagerEditor : Editor
         if (GUILayout.Button("Get Currently Connected Ports"))
         {
             var connectedPorts = arduinoManager.CheckIfConnected();
-            foreach(var item in connectedPorts)
+
+            if(connectedPorts != null)
             {
-                Debug.Log(item.Value + " At " + item.Key);
+                foreach (var item in connectedPorts)
+                {
+                    Debug.Log(item.Value + " At " + item.Key);
+                }
             }
+            else
+            {
+                Debug.LogWarning("No ports are currently connected.");
+            }
+
         }
         GUILayout.EndVertical();
     }

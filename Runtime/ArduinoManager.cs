@@ -169,7 +169,12 @@ public class ArduinoManager : MonoBehaviour
             }
         }
 
-        return currentlyConnected;
+        if(currentlyConnected.Count > 0)
+        {
+            return currentlyConnected;
+        }
+
+        return null;
     }
     private SerialPort SetupSerialPort(string portID)
     {
