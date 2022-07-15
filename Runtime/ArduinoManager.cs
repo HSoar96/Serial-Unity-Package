@@ -25,15 +25,16 @@ public class ArduinoManager : MonoBehaviour
     #region Serial Communication Methods
 #if UNITY_ARDUINO_API_SET
     /// <summary>
-    /// Gets port names that have the VID and PID stated connected. 
+    /// Gets devices that have the VID and PID. 
     /// </summary>
     /// <param name="VID">Vendor ID to look for</param>
     /// <param name="PID">Product ID to look for</param>
-    /// <returns>All COM Ports that have the specified device connected.</returns>
-    private Dictionary<string, string> ComPortNames(string VID, string PID)
+    /// <returns>All devices that have the specified VID and PID</returns>
+    private List<Device> GetDevicesWithPID(string VID, string PID)
     {
         // Make a new empty dictionary.
         var comPorts = new Dictionary<string, string>();
+        var devices = new List<Device>();
 
         // This is platform dependant and only works on windows.
         // It will format the string and initialise a new string list for comports.
@@ -64,6 +65,9 @@ public class ArduinoManager : MonoBehaviour
                         // Usually along the lines of "USB Serial Device (COMX)"
                         string friendlyName = (string)rk5.GetValue("FriendlyName");
 
+                        // Gets VID and PID but data needs to be parsed.
+                        string[] hardwareInfo = (string[])rk5.GetValue("HardwareID");
+
                         // Open the key where the important data for our use is.
                         RegistryKey rk6 = rk5.OpenSubKey("Device Parameters");
 
@@ -72,23 +76,22 @@ public class ArduinoManager : MonoBehaviour
 
                         // Add to our dictionary.
                         if (!string.IsNullOrEmpty(portName))
-                            comPorts.Add(portName, friendlyName);
+                            devices.Add(new Device(portName, friendlyName, hardwareInfo));
                     }
                 }
             }
         }
-        return comPorts;
+        return devices;
     }
 
     /// <summary>
     /// Gets all USB Serial devices that are stored in the registry, 
-    /// and adds them to a dictionary.
+    /// and adds them to a list.
     /// </summary>
-    /// <returns>All USB Com Ports stored in the registry</returns>
-    private Dictionary<string, string> ComPortNames()
+    /// <returns>All USB Com Devices stored in the registry</returns>
+    private List<Device> GetAllComDevices()
     {
-        // Make a new empty dictionary.
-        var comPorts = new Dictionary<string, string>();
+        var devices = new List<Device>();
 
         // Get to the base location of the registry where HID data is stored.
         RegistryKey rk1 = Registry.LocalMachine;
@@ -112,6 +115,9 @@ public class ArduinoManager : MonoBehaviour
                         // Usually along the lines of "USB Serial Device (COMX)"
                         string friendlyName = (string)rk5.GetValue("FriendlyName");
 
+                        // Gets VID and PID but data needs to be parsed.
+                        string[] hardwareInfo = (string[])rk5.GetValue("HardwareID");
+
                         // Open the key where the important data for our use is.
                         RegistryKey rk6 = rk5.OpenSubKey("Device Parameters");
                         string portName;
@@ -130,26 +136,27 @@ public class ArduinoManager : MonoBehaviour
                         // Add to our Lists.
                         if (!string.IsNullOrEmpty(portName))
                         {
-                            comPorts.Add(portName,friendlyName);
+
+                            devices.Add(new Device(portName, friendlyName, hardwareInfo));
                         }
                     }
                 }
             }
         }
-        return comPorts;
+        return devices;
     }
 
     /// <summary>
-    /// Gets every USB serial device and then tries to connect logging result and adding to a new dictionary.
+    /// Gets every USB serial device and then tries to connect.
     /// </summary>
-    /// <returns>A dictionary of currently connected devices port name and friendly name</returns>
-    public Dictionary<string, string> CheckIfConnected()
+    /// <returns>A list of currently connected devices</returns>
+    public List<Device> GetConnectedDevices()
     {
-        var currentlyConnected = new Dictionary<string, string>();
-
-        foreach(var item in ComPortNames())
+        var connectedDevices = new List<Device>();
+        var allDevices = GetAllComDevices();
+        foreach (Device device in allDevices)
         {
-            SerialPort port = new SerialPort(item.Key);
+            SerialPort port = new SerialPort(device.Port);
             try
             {
                 // If it opens immediatly close,
@@ -160,22 +167,21 @@ public class ArduinoManager : MonoBehaviour
                 }
                 port.Close();
 
-                Debug.Log($"{item.Value} Is currently plugged in");
-
-                currentlyConnected.Add(item.Key, item.Value);
+                connectedDevices.Add(device);
             }
             catch (Exception e)
             {
             }
+
         }
 
-        if(currentlyConnected.Count > 0)
+        if(connectedDevices.Count > 0)
         {
-            return currentlyConnected;
+            return connectedDevices;
         }
-
         return null;
     }
+
     private SerialPort SetupSerialPort(string portID)
     {
         if (!portID.StartsWith("COM"))
@@ -192,46 +198,29 @@ public class ArduinoManager : MonoBehaviour
 
         return port;
     }
-    public void BeginSerialCommuniation(string VID, string PID)
+    public void BeginSerialCommuniation(Device device)
     {
-        // Gets a list of COM Ports that exist with the specified VID and PID.
-        var portNames = ComPortNames(VID, PID);
-        foreach (var item in portNames)
+        serialPort = SetupSerialPort(device.Port);
+        if (!serialPort.IsOpen)
         {
-            Console.WriteLine($"Device with VID_{VID} and PID_{PID} detected at: {item.Key}");
-            Console.WriteLine();
-        }
-
-        if (portNames.Count != 0)
-        {
-            serialPort = SetupSerialPort(portNames.First().Key);
-
-            if (!serialPort.IsOpen)
+            // When a serial device is connected its COM port is saved in the registry.
+            // This will not change unless the registry is cleared, meaning even if the device
+            // is not plugged in it will be there, therefore the program will try and connect
+            // to a currently unplugged board. 
+            //TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
+            // and https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialpinchange (DsrChanged)
+            // to see if this can help determine if a device is currently connected before trying to open communication.
+            try
             {
-                // When a serial device is connected its COM port is saved in the registry.
-                // This will not change unless the registry is cleared, meaning even if the device
-                // is not plugged in it will be there, therefore the program will try and connect
-                // to a currently unplugged board. 
-                //TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
-                // and https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialpinchange (DsrChanged)
-                // to see if this can help determine if a device is currently connected before trying to open communication.
-                try
-                {
-                    serialPort.Open();
-                    Debug.Log($"Port Opened at {serialPort.PortName}");
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                }
+                serialPort.Open();
+                Debug.Log($"Port Opened at {serialPort.PortName}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
             }
         }
-        else
-        {
-            Debug.LogWarning("No ports exist.");
-        }
     }
-
     #endif
     #endregion
 }

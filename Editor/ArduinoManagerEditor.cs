@@ -33,20 +33,20 @@ public class ArduinoManagerEditor : Editor
         GUI.backgroundColor = HexToColour("#0078FF");
         if(GUILayout.Button("Begin Serial Communication"))
         {
-            arduinoManager.BeginSerialCommuniation("2886", "0004");
+            //arduinoManager.BeginSerialCommuniation("2886", "0004");
         }
 
         // Gets connected ports converts them to a list of strings
         // and shows them in the inspector.
         if (GUILayout.Button("Get Currently Connected Ports"))
         {
-            var connectedPorts = arduinoManager.CheckIfConnected();
+            List<Device> connectedDevices = arduinoManager.GetConnectedDevices();
 
-            if(connectedPorts != null)
+            if(connectedDevices != null)
             {
-                foreach (var item in connectedPorts)
+                foreach (Device device in connectedDevices)
                 {
-                    Debug.Log(item.Value + " At " + item.Key);
+                    Debug.Log(device.FriendlyName + " At " + device.Port);
                 }
             }
             else
