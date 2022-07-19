@@ -23,56 +23,32 @@ public class SerialManagerEditor : Editor
 
 #if UNITY_ARDUINO_API_SET
         // Display button to begin serial communication with selected device.
-        BeginSerialCommunication();
+        ConnectedDevicesButton();
         DisplayDevices();
 #endif
-        // Display button to show all connected devices and display them underneath the button.
-        //GUILayout.BeginVertical();
-        //GUILayout.BeginHorizontal();
-        //GUILayout.TextArea("This is a test");
-        //GUILayout.TextArea("This is a test 2");
-        //GUILayout.EndHorizontal();
-        //if (GUILayout.Button("Make New Devcie"))
-        //{
-        //    test.car1 = new Car("Name1", true);
-        //}
-        //GUILayout.EndVertical();
     }
 
 #if UNITY_ARDUINO_API_SET
-    //DEBUG: Remove after Testing;
-    private void BeginSerialCommunication()
+    /// <summary>
+    /// Displays a button that on press updates currently connected devices.
+    /// </summary>
+    private void ConnectedDevicesButton()
     {
-        GUILayout.BeginVertical();
         GUI.backgroundColor = HexToColour("#0078FF");
-        if (GUILayout.Button("Begin Serial Communication"))
-        {
-            //arduinoManager.BeginSerialCommuniation("2886", "0004");
-        }
-
+        GUILayout.BeginVertical();       
         // Gets connected ports converts them to a list of strings
         // and shows them in the inspector.
         if (GUILayout.Button("Get Currently Connected Devices"))
         {
             serialManager.GetConnectedDevices();
-            var devices = serialManager.connectedDevices;
-            if (devices != null)
-            {
-                foreach (Device device in devices)
-                {
-                    Debug.Log(device.FriendlyName + " At " + device.Port);
-                }
-            }
-            else
-            {
-                Debug.LogWarning("No devices are currently connected.");
-            }
-
         }
         GUILayout.EndVertical();
     }
-#endif
-#if UNITY_ARDUINO_API_SET
+
+    /// <summary>
+    /// Displays a list of all connected devices with a button for users
+    /// to choose the device they want to use 
+    /// </summary>
     private void DisplayDevices()
     {
         if (serialManager.connectedDevices == null)
@@ -183,8 +159,7 @@ public class SerialManagerEditor : Editor
         {
             hex = "#" + hex;
         }
-        Color color = new Color();
-        ColorUtility.TryParseHtmlString(hex, out color);
+        ColorUtility.TryParseHtmlString(hex, out Color color);
         return color;
     }
 }
