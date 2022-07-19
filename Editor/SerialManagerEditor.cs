@@ -2,27 +2,41 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(ArduinoManager))]
-public class ArduinoManagerEditor : Editor
+[CustomEditor(typeof(SerialManager))]
+public class SerialManagerEditor : Editor
 {
     private BuildTargetGroup buildTargetGroup;
-    private ArduinoManager arduinoManager;
+    private SerialManager serialManager;
 
     public override void OnInspectorGUI()
-    {   
+    {
         // Build target group is being depreceated
         // however no unity method exists at the moment to replace it.
         // TODO: Make a new method that uses NamedBuildTarget.
         buildTargetGroup = BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget);
-        arduinoManager = target as ArduinoManager;
+        serialManager = target as SerialManager;
 
         base.OnInspectorGUI();
 
+        // Display text and button to change the API level.
         SetAPILevel();
 
-        #if UNITY_ARDUINO_API_SET
+#if UNITY_ARDUINO_API_SET
+        // Display button to begin serial communication with selected device.
         BeginSerialCommunication();
-        #endif
+        DisplayDevices();
+#endif
+        // Display button to show all connected devices and display them underneath the button.
+        //GUILayout.BeginVertical();
+        //GUILayout.BeginHorizontal();
+        //GUILayout.TextArea("This is a test");
+        //GUILayout.TextArea("This is a test 2");
+        //GUILayout.EndHorizontal();
+        //if (GUILayout.Button("Make New Devcie"))
+        //{
+        //    test.car1 = new Car("Name1", true);
+        //}
+        //GUILayout.EndVertical();
     }
 
 #if UNITY_ARDUINO_API_SET
@@ -31,34 +45,68 @@ public class ArduinoManagerEditor : Editor
     {
         GUILayout.BeginVertical();
         GUI.backgroundColor = HexToColour("#0078FF");
-        if(GUILayout.Button("Begin Serial Communication"))
+        if (GUILayout.Button("Begin Serial Communication"))
         {
             //arduinoManager.BeginSerialCommuniation("2886", "0004");
         }
 
         // Gets connected ports converts them to a list of strings
         // and shows them in the inspector.
-        if (GUILayout.Button("Get Currently Connected Ports"))
+        if (GUILayout.Button("Get Currently Connected Devices"))
         {
-            List<Device> connectedDevices = arduinoManager.GetConnectedDevices();
-
-            if(connectedDevices != null)
+            serialManager.GetConnectedDevices();
+            var devices = serialManager.connectedDevices;
+            if (devices != null)
             {
-                foreach (Device device in connectedDevices)
+                foreach (Device device in devices)
                 {
                     Debug.Log(device.FriendlyName + " At " + device.Port);
                 }
             }
             else
             {
-                Debug.LogWarning("No ports are currently connected.");
+                Debug.LogWarning("No devices are currently connected.");
             }
 
         }
         GUILayout.EndVertical();
     }
 #endif
+#if UNITY_ARDUINO_API_SET
+    private void DisplayDevices()
+    {
+        if (serialManager.connectedDevices == null)
+            return;
 
+        bool deviceChosen = false;
+        for (int i = 0; i < serialManager.connectedDevices.Count; i++)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            GUILayout.TextArea(serialManager.connectedDevices[i].FriendlyName);
+            GUILayout.TextArea(serialManager.connectedDevices[i].Port);
+            serialManager.connectedDevices[i].Chosen = GUILayout.Toggle(serialManager.connectedDevices[i].Chosen, "Use This Device");
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+
+            // If a device is chosen define the device to use and set others to false.
+            if (serialManager.connectedDevices[i].Chosen)
+            {
+                deviceChosen = true;
+                for (int j = 0; j < serialManager.connectedDevices.Count; j++)
+                {
+                    if (j != i)
+                    {
+                        serialManager.connectedDevices[j].Chosen = false;
+                    }
+                }
+                serialManager.deviceChosen = serialManager.connectedDevices[i];
+            }
+        }
+        if (!deviceChosen)
+            serialManager.deviceChosen = null;
+    }
+#endif
 
     /// <summary>
     /// Creates UI elements that check API level 

@@ -1,44 +1,133 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using UnityEngine;
-using System.Linq;
 
 #if UNITY_ARDUINO_API_SET
 using System.IO.Ports;
-using System.Management;
 #endif
 
-public class ArduinoManager : MonoBehaviour
+public class SerialManager : MonoBehaviour
 {
-    #region Serial Communication Variables
-    #if UNITY_ARDUINO_API_SET
-    private const int BAUD_RATE = 115200;
-    private const int DATA_BITS = 8;
-    private const int READ_TIMEOUT = 1;
-    private SerialPort serialPort = new SerialPort();
-#endif
-    #endregion
+    [HideInInspector]
+    public Device deviceChosen = null;
+    private Device deviceToUse = null;
+    [SerializeField]
+    [HideInInspector]
+    public List<Device> connectedDevices = null;
 
-    #region Serial Communication Methods
+#if UNITY_ARDUINO_API_SET
+    #region Serial Communication Variables
+    private const int BAUD_RATE = 9600;
+    private const int DATA_BITS = 8;
+    // Timeout is in miliseconds, 1ms response time equates to 
+    // 1 frame at 1000fps meaning it shouldnt cause any meaningful delay
+    // to the program.
+    private const int READ_TIMEOUT = 1;
+    public SerialPort serialPort = null;
+    #endregion
+    private void Start()
+    {
+        UpdateDeviceToUse(deviceChosen);
+        BeginSerialCommuniation();
+    }
+#endif
+
 #if UNITY_ARDUINO_API_SET
     /// <summary>
-    /// Gets devices that have the VID and PID. 
+    /// Gets every USB serial device and then tries to connect.
     /// </summary>
-    /// <param name="VID">Vendor ID to look for</param>
-    /// <param name="PID">Product ID to look for</param>
-    /// <returns>All devices that have the specified VID and PID</returns>
-    private List<Device> GetDevicesWithPID(string VID, string PID)
+    /// <returns>A list of currently connected devices</returns>
+    public void GetConnectedDevices()
     {
-        // Make a new empty dictionary.
-        var comPorts = new Dictionary<string, string>();
-        var devices = new List<Device>();
+        connectedDevices.Clear();
+        var allDevices = GetAllComDevices();
+        foreach (Device device in allDevices)
+        {
+            SerialPort port = new SerialPort(device.Port);
+            try
+            {
+                // If it opens immediatly close,
+                // log it and add to dictionary.
+                if (!port.IsOpen)
+                {
+                    port.Open();
+                }
+                port.Close();
+
+                connectedDevices.Add(device);
+            }
+            catch (Exception e)
+            {
+            }
+
+        }
+    }
+    public void BeginSerialCommuniation()
+    {
+        if (deviceToUse == null)
+            throw new NullReferenceException("Chosen device cannot be null.");
+
+        serialPort = SetupSerialPort(deviceToUse.Port);
+        if (!serialPort.IsOpen)
+        {
+            // When a serial device is connected its COM port is saved in the registry.
+            // This will not change unless the registry is cleared, meaning even if the device
+            // is not plugged in it will be there, therefore the program will try and connect
+            // to a currently unplugged board. 
+            //TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
+            // and https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialpinchange (DsrChanged)
+            // to see if this can help determine if a device is currently connected before trying to open communication.
+            try
+            {
+                serialPort.Open();
+                Debug.Log($"Port Opened at {serialPort.PortName}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets up a USB Serial Port
+    /// </summary>
+    /// <param name="portID"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    private SerialPort SetupSerialPort(string portID)
+    {
+        if (!portID.StartsWith("COM"))
+            throw new Exception("Port ID must begin with COM");
+
+        SerialPort port = new SerialPort(portID);
+
+        port.BaudRate = BAUD_RATE;
+        port.Parity = Parity.None;
+        port.StopBits = StopBits.One;
+        port.DataBits = DATA_BITS;
+        port.Handshake = Handshake.None;
+        port.ReadTimeout = READ_TIMEOUT;
+
+        return port;
+    }
+#endif
+    /// <summary>
+    /// Updates the device to be used by searching 
+    /// for the VID and PID that the chosen device has.
+    /// </summary>
+    /// <param name="chosenDevice">Device whos VID and PID you will search for </param>
+    /// <exception cref="Exception"></exception>
+    private void UpdateDeviceToUse(Device chosenDevice)
+    {
+        if (chosenDevice == null)
+            throw new Exception("Device cannot be null");
 
         // This is platform dependant and only works on windows.
         // It will format the string and initialise a new string list for comports.
-        string pattern = string.Format("^VID_{0}.PID_{1}", VID, PID);
+        string pattern = string.Format("^VID_{0}.PID_{1}", chosenDevice.VID, chosenDevice.PID);
         Regex _rx = new Regex(pattern, RegexOptions.IgnoreCase);
 
         // Get to the base location of the registry where HID data is stored.
@@ -59,8 +148,6 @@ public class ArduinoManager : MonoBehaviour
                     {
                         // Here you can get all the data from the devices with those VIDs and PIDs.
                         RegistryKey rk5 = rk4.OpenSubKey(s2);
-                        // This gives data in the form of "Port_#000X.Hub_#000Y
-                        string location = (string)rk5.GetValue("LocationInformation");
 
                         // Usually along the lines of "USB Serial Device (COMX)"
                         string friendlyName = (string)rk5.GetValue("FriendlyName");
@@ -74,14 +161,16 @@ public class ArduinoManager : MonoBehaviour
                         // Port name is formatted as "COMX"
                         string portName = (string)rk6.GetValue("PortName");
 
-                        // Add to our dictionary.
+                        // Create a new device that will be the first device with that VID and PID found.
                         if (!string.IsNullOrEmpty(portName))
-                            devices.Add(new Device(portName, friendlyName, hardwareInfo));
+                        {
+                            deviceToUse = new Device(portName, friendlyName, hardwareInfo);
+                            return;
+                        }
                     }
                 }
             }
         }
-        return devices;
     }
 
     /// <summary>
@@ -128,7 +217,7 @@ public class ArduinoManager : MonoBehaviour
                         {
                             portName = (string)rk6.GetValue("PortName");
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             portName = null;
                         }
@@ -146,81 +235,5 @@ public class ArduinoManager : MonoBehaviour
         return devices;
     }
 
-    /// <summary>
-    /// Gets every USB serial device and then tries to connect.
-    /// </summary>
-    /// <returns>A list of currently connected devices</returns>
-    public List<Device> GetConnectedDevices()
-    {
-        var connectedDevices = new List<Device>();
-        var allDevices = GetAllComDevices();
-        foreach (Device device in allDevices)
-        {
-            SerialPort port = new SerialPort(device.Port);
-            try
-            {
-                // If it opens immediatly close,
-                // log it and add to dictionary.
-                if (!port.IsOpen)
-                {
-                    port.Open();
-                }
-                port.Close();
 
-                connectedDevices.Add(device);
-            }
-            catch (Exception e)
-            {
-            }
-
-        }
-
-        if(connectedDevices.Count > 0)
-        {
-            return connectedDevices;
-        }
-        return null;
-    }
-
-    private SerialPort SetupSerialPort(string portID)
-    {
-        if (!portID.StartsWith("COM"))
-            throw new System.Exception("Port ID must begin with COM");
-        
-        SerialPort port = new SerialPort(portID);
-
-        port.BaudRate = BAUD_RATE;
-        port.Parity = Parity.None;
-        port.StopBits = StopBits.One;
-        port.DataBits = DATA_BITS;
-        port.Handshake = Handshake.None;
-        port.ReadTimeout = READ_TIMEOUT;
-
-        return port;
-    }
-    public void BeginSerialCommuniation(Device device)
-    {
-        serialPort = SetupSerialPort(device.Port);
-        if (!serialPort.IsOpen)
-        {
-            // When a serial device is connected its COM port is saved in the registry.
-            // This will not change unless the registry is cleared, meaning even if the device
-            // is not plugged in it will be there, therefore the program will try and connect
-            // to a currently unplugged board. 
-            //TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
-            // and https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialpinchange (DsrChanged)
-            // to see if this can help determine if a device is currently connected before trying to open communication.
-            try
-            {
-                serialPort.Open();
-                Debug.Log($"Port Opened at {serialPort.PortName}");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-            }
-        }
-    }
-    #endif
-    #endregion
 }
