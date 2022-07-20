@@ -15,7 +15,7 @@ public class SerialDeviceManager : MonoBehaviour
     private Device deviceToUse = null;
     [SerializeField]
     [HideInInspector]
-    public List<Device> connectedDevices = null;
+    public List<Device> connectedDevices = new List<Device>();
 
 #if UNITY_ARDUINO_API_SET
     #region Serial Communication Variables
