@@ -131,7 +131,6 @@ public class SerialDeviceManager : MonoBehaviour
 
         return port;
     }
-#endif
 
     /// <summary>
     /// Updates the device to be used by searching 
@@ -253,6 +252,7 @@ public class SerialDeviceManager : MonoBehaviour
         }
         return devices;
     }
+#endif
 
 
 }
