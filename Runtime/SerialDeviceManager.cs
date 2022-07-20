@@ -25,7 +25,7 @@ public class SerialDeviceManager : MonoBehaviour
     // 1 frame at 1000fps meaning it shouldnt cause any meaningful delay
     // to the program.
     private const int READ_TIMEOUT = 1;
-    private SerialPort serialPort = null;
+    public SerialPort serialPort = null;
     #endregion
     private void Start()
     {
