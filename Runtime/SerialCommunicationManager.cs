@@ -23,13 +23,21 @@ public class SerialCommunicationManager : MonoBehaviour
     /// Sends a message followed by defined newline char across the open serial device.
     /// </summary>
     /// <param name="message">Message to send across the serial port.</param>
-    /// <exception cref="NullReferenceException"></exception>
     public void SerialWriteLine(string message)
     {
+        SerialWrite(message + NEWLINE_CHAR);
+    }
+    /// <summary>
+    /// Sends a message alone the open serial device with no newline char.
+    /// </summary>
+    /// <param name="message">Message t send across the serial port.</param>
+    /// <exception cref="NullReferenceException"></exception>
+    public void SerialWrite(string message)
+    {
         if (port == null)
-            throw new NullReferenceException("Serial Port cannot be null.");
+            throw new NullReferenceException("Serial Port cannot be null");
 
-        port.Write(message + NEWLINE_CHAR);
+        port.Write(message);
     }
 #endif
 }
