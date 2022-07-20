@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(SerialDeviceManager))]
+[CustomEditor(typeof(SerialDeviceManager)),CanEditMultipleObjects]
 public class SerialDeviceManagerEditor : Editor
 {
     private BuildTargetGroup buildTargetGroup;
