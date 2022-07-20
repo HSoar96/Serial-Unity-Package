@@ -27,7 +27,7 @@ public class SerialDeviceManager : MonoBehaviour
     private const int READ_TIMEOUT = 1;
     public SerialPort serialPort = null;
     #endregion
-    private void Start()
+    private void Awake()
     {
         BeginSerialCommuniation();
     }

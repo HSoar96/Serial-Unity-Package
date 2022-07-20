@@ -13,7 +13,7 @@ public class SerialCommunicationManager : MonoBehaviour
     private const char NEWLINE_CHAR = '\n';
     private SerialDeviceManager serialDeviceManager;
     private SerialPort port = null;
-    private void Awake()
+    private void Start()
     {
         serialDeviceManager = GetComponent<SerialDeviceManager>();
         port = serialDeviceManager.serialPort;
