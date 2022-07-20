@@ -1,6 +1,6 @@
 {
   "name": "com.hsoar.unity-arduino",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "Unity Arduino",
   "description": "A barebones package designed to interface arduino based devices with unity.",
   "unity": "2020.3",
@@ -11,9 +11,14 @@
   },
   "samples": [
     {
+      "displayName": "Arduino LED Changer",
+      "description": "A scene containing a Serial Manager, an LED changing script that enables an LED pressing W and disables with S. As well as corrosponding Arduino .INO and PlatformIO .cpp files.",
+      "path": "Samples~/Arduino LED Changer"
+    },
+    {
       "displayName": "Serial Manager Prefab",
       "description": "Contains a sample Serial Manager prefab to use in your scenes.",
-      "path": "Samples~/SerialManager"
+      "path": "Samples~/Serial Manager"
     }
   ]
 }
