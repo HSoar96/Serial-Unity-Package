@@ -28,62 +28,6 @@ public class SerialManagerEditor : Editor
 #endif
     }
 
-#if UNITY_ARDUINO_API_SET
-    /// <summary>
-    /// Displays a button that on press updates currently connected devices.
-    /// </summary>
-    private void ConnectedDevicesButton()
-    {
-        GUI.backgroundColor = HexToColour("#0078FF");
-        GUILayout.BeginVertical();       
-        // Gets connected ports converts them to a list of strings
-        // and shows them in the inspector.
-        if (GUILayout.Button("Get Currently Connected Devices"))
-        {
-            serialManager.GetConnectedDevices();
-        }
-        GUILayout.EndVertical();
-    }
-
-    /// <summary>
-    /// Displays a list of all connected devices with a button for users
-    /// to choose the device they want to use 
-    /// </summary>
-    private void DisplayDevices()
-    {
-        if (serialManager.connectedDevices == null)
-            return;
-
-        bool deviceChosen = false;
-        for (int i = 0; i < serialManager.connectedDevices.Count; i++)
-        {
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
-            GUILayout.TextArea(serialManager.connectedDevices[i].FriendlyName);
-            GUILayout.TextArea(serialManager.connectedDevices[i].Port);
-            serialManager.connectedDevices[i].Chosen = GUILayout.Toggle(serialManager.connectedDevices[i].Chosen, "Use This Device");
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-
-            // If a device is chosen define the device to use and set others to false.
-            if (serialManager.connectedDevices[i].Chosen)
-            {
-                deviceChosen = true;
-                for (int j = 0; j < serialManager.connectedDevices.Count; j++)
-                {
-                    if (j != i)
-                    {
-                        serialManager.connectedDevices[j].Chosen = false;
-                    }
-                }
-                serialManager.deviceChosen = serialManager.connectedDevices[i];
-            }
-        }
-        if (!deviceChosen)
-            serialManager.deviceChosen = null;
-    }
-#endif
-
     /// <summary>
     /// Creates UI elements that check API level 
     /// and allow the user to press a button to change it if required.
@@ -147,6 +91,62 @@ public class SerialManagerEditor : Editor
         // string of current defines to add a new one.
         PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, currentDefines + ";" + define);
     }
+
+#if UNITY_ARDUINO_API_SET
+    /// <summary>
+    /// Displays a button that on press updates currently connected devices.
+    /// </summary>
+    private void ConnectedDevicesButton()
+    {
+        GUI.backgroundColor = HexToColour("#0078FF");
+        GUILayout.BeginVertical();       
+        // Gets connected ports converts them to a list of strings
+        // and shows them in the inspector.
+        if (GUILayout.Button("Get Currently Connected Devices"))
+        {
+            serialManager.GetConnectedDevices();
+        }
+        GUILayout.EndVertical();
+    }
+
+    /// <summary>
+    /// Displays a list of all connected devices with a button for users
+    /// to choose the device they want to use 
+    /// </summary>
+    private void DisplayDevices()
+    {
+        if (serialManager.connectedDevices == null)
+            return;
+
+        bool deviceChosen = false;
+        for (int i = 0; i < serialManager.connectedDevices.Count; i++)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            GUILayout.TextArea(serialManager.connectedDevices[i].FriendlyName);
+            GUILayout.TextArea(serialManager.connectedDevices[i].Port);
+            serialManager.connectedDevices[i].Chosen = GUILayout.Toggle(serialManager.connectedDevices[i].Chosen, "Use This Device");
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+
+            // If a device is chosen define the device to use and set others to false.
+            if (serialManager.connectedDevices[i].Chosen)
+            {
+                deviceChosen = true;
+                for (int j = 0; j < serialManager.connectedDevices.Count; j++)
+                {
+                    if (j != i)
+                    {
+                        serialManager.connectedDevices[j].Chosen = false;
+                    }
+                }
+                serialManager.deviceChosen = serialManager.connectedDevices[i];
+            }
+        }
+        if (!deviceChosen)
+            serialManager.deviceChosen = null;
+    }
+#endif
 
     /// <summary>
     /// Trys to parse a hex value into a unity Color and returns it.

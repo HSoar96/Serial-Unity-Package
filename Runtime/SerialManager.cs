@@ -25,11 +25,10 @@ public class SerialManager : MonoBehaviour
     // 1 frame at 1000fps meaning it shouldnt cause any meaningful delay
     // to the program.
     private const int READ_TIMEOUT = 1;
-    public SerialPort serialPort = null;
+    private SerialPort serialPort = null;
     #endregion
     private void Start()
     {
-        UpdateDeviceToUse(deviceChosen);
         BeginSerialCommuniation();
     }
 #endif
@@ -60,12 +59,21 @@ public class SerialManager : MonoBehaviour
             }
             catch (Exception e)
             {
+                Debug.LogWarning($"{device.FriendlyName} not currently connected at {device.Port} \n" + e);
             }
 
         }
     }
-    public void BeginSerialCommuniation()
+
+    /// <summary>
+    /// Updates the device to use, sets up the serial port,
+    /// and trys to open serial communication.
+    /// </summary>
+    /// <exception cref="NullReferenceException"></exception>
+    private void BeginSerialCommuniation()
     {
+        UpdateDeviceToUse(deviceChosen);
+
         if (deviceToUse == null)
             throw new NullReferenceException("Chosen device cannot be null.");
 
@@ -82,20 +90,19 @@ public class SerialManager : MonoBehaviour
             try
             {
                 serialPort.Open();
-                Debug.Log($"Port Opened at {serialPort.PortName}");
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Debug.LogException(ex);
+                Debug.LogException(e);
             }
         }
     }
 
     /// <summary>
-    /// Sets up a USB Serial Port
+    /// Sets up a USB Serial Port.
     /// </summary>
-    /// <param name="portID"></param>
-    /// <returns></returns>
+    /// <param name="portID">The COM ID to use</param>
+    /// <returns>A correclty setup Serial Port</returns>
     /// <exception cref="Exception"></exception>
     private SerialPort SetupSerialPort(string portID)
     {
@@ -114,6 +121,7 @@ public class SerialManager : MonoBehaviour
         return port;
     }
 #endif
+
     /// <summary>
     /// Updates the device to be used by searching 
     /// for the VID and PID that the chosen device has.
