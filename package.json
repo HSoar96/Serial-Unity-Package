@@ -11,9 +11,9 @@
   },
   "samples": [
     {
-      "displayName": "Serial Device Manager Prefab",
-      "description": "Contains a sample Serial Device Manager prefab to use in your scenes.",
-      "path": "Samples~/SerialDeviceManager"
+      "displayName": "Serial Manager Prefab",
+      "description": "Contains a sample Serial Manager prefab to use in your scenes.",
+      "path": "Samples~/SerialManager"
     }
   ]
 }
