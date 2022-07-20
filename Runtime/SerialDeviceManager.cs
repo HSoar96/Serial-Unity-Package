@@ -27,6 +27,13 @@ public class SerialDeviceManager : MonoBehaviour
     private const int READ_TIMEOUT = 1;
     public SerialPort serialPort = null;
     #endregion
+
+    private void OnApplicationQuit()
+    {
+        if (serialPort.IsOpen)
+            serialPort.Close();
+    }
+
     private void Awake()
     {
         BeginSerialCommuniation();
