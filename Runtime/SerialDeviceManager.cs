@@ -31,7 +31,10 @@ public class SerialDeviceManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         if (serialPort.IsOpen)
+        {
             serialPort.Close();
+            Debug.LogWarning($"Serial communcation ended with {deviceToUse.FriendlyName} @ {serialPort.PortName}");
+        }
     }
 
     private void Awake()
@@ -97,6 +100,7 @@ public class SerialDeviceManager : MonoBehaviour
             try
             {
                 serialPort.Open();
+                Debug.LogWarning($"Serial communcation beugun with {deviceToUse.FriendlyName} @ {serialPort.PortName} @ {serialPort.BaudRate} BAUD.");
             }
             catch (Exception e)
             {
