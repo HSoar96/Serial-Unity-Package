@@ -30,7 +30,7 @@ public class SerialDeviceManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        if (serialPort.IsOpen)
+        if (serialPort != null && serialPort.IsOpen)
         {
             serialPort.Close();
             Debug.LogWarning($"Serial communcation ended with {deviceToUse.FriendlyName} @ {serialPort.PortName}");
@@ -85,7 +85,7 @@ public class SerialDeviceManager : MonoBehaviour
         UpdateDeviceToUse(deviceChosen);
 
         if (deviceToUse == null)
-            throw new NullReferenceException("Chosen device cannot be null.");
+            throw new NullReferenceException("Chosen device cannot be null. Are you sure you chose a device in Serial Device Manager?");
 
         serialPort = SetupSerialPort(deviceToUse.Port);
         if (!serialPort.IsOpen)
@@ -100,7 +100,7 @@ public class SerialDeviceManager : MonoBehaviour
             try
             {
                 serialPort.Open();
-                Debug.LogWarning($"Serial communcation beugun with {deviceToUse.FriendlyName} @ {serialPort.PortName} @ {serialPort.BaudRate} BAUD.");
+                Debug.LogWarning($"Serial communcation begun with {deviceToUse.FriendlyName} @ {serialPort.PortName} @ {serialPort.BaudRate} BAUD.");
             }
             catch (Exception e)
             {

@@ -35,7 +35,7 @@ public class SerialCommunicationManager : MonoBehaviour
     public void SerialWrite(string message)
     {
         if (port == null)
-            throw new NullReferenceException("Serial Port cannot be null");
+            throw new NullReferenceException("Serial Port cannot be null.\nAre you sure you chose a device in Serial Device Manager?");
 
         port.Write(message);
     }
@@ -47,7 +47,7 @@ public class SerialCommunicationManager : MonoBehaviour
     public string SerialReadLine()
     {
         if (port == null)
-            throw new NullReferenceException("Serial port cannot be null");
+            throw new NullReferenceException("Serial Port cannot be null.\nAre you sure you chose a device in Serial Device Manager?");
 
         string data;
         try
