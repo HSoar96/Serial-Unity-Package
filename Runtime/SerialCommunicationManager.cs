@@ -39,5 +39,26 @@ public class SerialCommunicationManager : MonoBehaviour
 
         port.Write(message);
     }
+    /// <summary>
+    /// Reads the serial port unitl the newline char \n is read or until timeout.
+    /// </summary>
+    /// <returns>Data read in the serial port. Or null if timed out.</returns>
+    /// <exception cref="NullReferenceException"></exception>
+    public string SerialReadLine()
+    {
+        if (port == null)
+            throw new NullReferenceException("Serial port cannot be null");
+
+        string data;
+        try
+        {
+            data = port.ReadLine();
+        }
+        catch (TimeoutException e)
+        {
+            return null;
+        }
+        return data;
+    }
 #endif
 }
