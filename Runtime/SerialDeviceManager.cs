@@ -8,7 +8,7 @@ using UnityEngine;
 using System.IO.Ports;
 #endif
 
-public class SerialManager : MonoBehaviour
+public class SerialDeviceManager : MonoBehaviour
 {
     [HideInInspector]
     public Device deviceChosen = null;

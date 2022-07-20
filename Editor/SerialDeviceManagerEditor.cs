@@ -2,11 +2,11 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(SerialManager))]
-public class SerialManagerEditor : Editor
+[CustomEditor(typeof(SerialDeviceManager))]
+public class SerialDeviceManagerEditor : Editor
 {
     private BuildTargetGroup buildTargetGroup;
-    private SerialManager serialManager;
+    private SerialDeviceManager serialManager;
 
     public override void OnInspectorGUI()
     {
@@ -14,7 +14,7 @@ public class SerialManagerEditor : Editor
         // however no unity method exists at the moment to replace it.
         // TODO: Make a new method that uses NamedBuildTarget.
         buildTargetGroup = BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget);
-        serialManager = target as SerialManager;
+        serialManager = target as SerialDeviceManager;
 
         base.OnInspectorGUI();
 
