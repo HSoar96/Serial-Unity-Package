@@ -19,12 +19,12 @@ public class SerialDeviceManager : MonoBehaviour
 
 #if UNITY_ARDUINO_API_SET
     #region Serial Communication Variables
-    private const int BAUD_RATE = 9600;
+    private const int BAUD_RATE = 115200;
     private const int DATA_BITS = 8;
     // Timeout is in miliseconds, 1ms response time equates to 
     // 1 frame at 1000fps meaning it shouldnt cause any meaningful delay
     // to the program.
-    private const int READ_TIMEOUT = 1;
+    private const int READ_TIMEOUT = 10;
     public SerialPort serialPort = null;
     #endregion
 
