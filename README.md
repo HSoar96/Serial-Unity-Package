@@ -4,10 +4,6 @@ A Unity package to enable easy 2 way serial communication between the Unity Edit
 
 This package only works on Windows however Unix compatibility is in the works.
 
-**Table of Contents**
-
-[TOC]
-
 ## Installation
 
 Use [Unity Package Manager](https://docs.unity3d.com/Manual/upm-ui.html) to add Unity Arduino Package to your project. You can either do this via the GIT URL option or via disk.
