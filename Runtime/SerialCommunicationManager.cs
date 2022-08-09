@@ -70,19 +70,12 @@ public class SerialCommunicationManager : MonoBehaviour
     /// <exception cref="NullReferenceException"></exception>
     public string[] ReadPinData(char seperator)
     {
-        if (port == null)
-            throw new NullReferenceException("Serial Port cannot be null.\nAre you sure you chose a device in Serial Device Manager?");
+        string rawData = SerialReadLine();
 
-        string[] data;
-        try
-        {
-            data = port.ReadLine().Split(seperator);
-        }
-        catch (TimeoutException e)
-        {
+        if (rawData == null)
             return null;
-        }
-        return data;
+        else
+            return rawData.Split(seperator);
     }
 #endif
 }
