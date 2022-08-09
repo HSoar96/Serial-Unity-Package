@@ -80,15 +80,21 @@ void loop()
 ```
 
 ## Samples
-There are currently two samples that can be imported through the Unity Package Manager.
+There are currently three samples that can be imported through the Unity Package Manager.
 
-A sample Serial Manager prefab and a an LED Changer.
+- A sample Serial Manager Prefab
+- An Onboard LED Changer
+- A simple XY Controller
 
-The LED Changer includes both a functioning unity scene and example arduino scripts in both a ```.cpp``` and ```.ino``` format.
+The sample serial manager prefab contains only the serial manager and no scene.
 
-The example turns on the arduinos built in LED when W or S is pressed at runtime in the unity scene.
+The LED Changer and XY Controller include both a functioning unity scene and example arduino scripts in both a ```.cpp``` and ```.ino``` format.
 
-It has currently been tested on the following devices.
+The LED Changer turns on the arduinos built in LED when W or S is pressed at runtime in the unity scene.
+
+The XY Controller uses two potentiometers to move a GameObject in the X and Y directions
+
+The samples have currently been tested on the following devices.
 
 - Teensy 4.1, 4.0, 3.6 & 3.2
 - Seeduino V4.2
