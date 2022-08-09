@@ -19,6 +19,11 @@
       "displayName": "Serial Manager Prefab",
       "description": "Contains a sample Serial Manager prefab to use in your scenes.",
       "path": "Samples~/Serial Manager"
+    },
+    {
+      "displayName": "XY Controller",
+      "description": "A scene containing a Serial Manager, a XY Controller script that uses two potentiometers to control a cube on screen. As well as the corrosponding Arduino .INO and .CPP files.",
+      "path": "Samples~/Serial Manager"
     }
   ]
 }
