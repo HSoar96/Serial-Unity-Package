@@ -39,6 +39,7 @@ public class SerialCommunicationManager : MonoBehaviour
 
         port.Write(message);
     }
+
     /// <summary>
     /// Reads the serial port unitl the newline char \n is read or until timeout.
     /// </summary>
@@ -53,6 +54,29 @@ public class SerialCommunicationManager : MonoBehaviour
         try
         {
             data = port.ReadLine();
+        }
+        catch (TimeoutException e)
+        {
+            return null;
+        }
+        return data;
+    }
+
+    /// <summary>
+    /// Reads the serial port unitl the newline char \n is read or until timeout. Then splits the data.
+    /// </summary>
+    /// <param name="seperator">A character array that delimits the substrings in the read string</param>
+    /// <returns>Data read in the serial port. Or null if timed out.</returns>
+    /// <exception cref="NullReferenceException"></exception>
+    public string[] ReadPinData(char seperator)
+    {
+        if (port == null)
+            throw new NullReferenceException("Serial Port cannot be null.\nAre you sure you chose a device in Serial Device Manager?");
+
+        string[] data;
+        try
+        {
+            data = port.ReadLine().Split(seperator);
         }
         catch (TimeoutException e)
         {
