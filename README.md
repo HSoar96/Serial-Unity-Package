@@ -20,8 +20,10 @@ There are 3 public Methods in  ```SerialCommunicationManager.cs``` that you can 
 Sends a message over the chosen serial port followed by the chosen newline character. 
 #### SerialWrite
 Sends a message over the chosen serial port.
-### SerialReadLine 
+#### SerialReadLine 
 Reads incomming data from the serial port up until the chosen new line character or until it times out.
+#### ReadPinData
+Reads incomming data from the serial port and then splits it using the defined delimiter. Returning an array of strings.  It is reccomended to use this to recieve data from specific pins. This becomes useful when sending data from lots of pins and allows for easy comparisons.
 
 ### Arduino
 If required by your specific device e.g. Teensy's set the operation mode to Serial.
