@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 #if UNITY_ARDUINO_API_SET
 using System.IO.Ports;
@@ -30,16 +31,32 @@ public class SerialDeviceManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        // Ensures the port is closed when the program closes.
+        CloseSerialPort();
+    }
+
+    private void OnSceneUnloaded(Scene currentScene)
+    {
+        // Ensures the port is closed when the scene is unloaded.
+        CloseSerialPort();
+    }
+
+    private void Awake()
+    {
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+        BeginSerialCommuniation();
+    }
+
+    /// <summary>
+    /// Closes a currently open serial port.
+    /// </summary>
+    private void CloseSerialPort()
+    {
         if (serialPort != null && serialPort.IsOpen)
         {
             serialPort.Close();
             Debug.LogWarning($"Serial communcation ended with {deviceToUse.FriendlyName} @ {serialPort.PortName}");
         }
-    }
-
-    private void Awake()
-    {
-        BeginSerialCommuniation();
     }
 #endif
 
