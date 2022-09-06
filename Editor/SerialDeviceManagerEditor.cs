@@ -5,11 +5,20 @@ using System.Collections.Generic;
 [CustomEditor(typeof(SerialDeviceManager)),CanEditMultipleObjects]
 public class SerialDeviceManagerEditor : Editor
 {
+    #region Styles
+    private bool stylesInitilised = false;
+    private GUIStyle headerLabel;
+    #endregion
+
     private BuildTargetGroup buildTargetGroup;
     private SerialDeviceManager serialManager;
 
+
     public override void OnInspectorGUI()
     {
+        if (!stylesInitilised)
+            InitiliseStyles();
+
         // Build target group is being depreceated
         // however no unity method exists at the moment to replace it.
         // TODO: Make a new method that uses NamedBuildTarget.
@@ -26,6 +35,21 @@ public class SerialDeviceManagerEditor : Editor
         ConnectedDevicesButton();
         DisplayDevices();
 #endif
+    }
+
+    /// <summary>
+    /// Sets styles to improve readability.
+    /// </summary>
+    void InitiliseStyles()
+    {
+        stylesInitilised = true;
+        headerLabel = new GUIStyle(GUI.skin.label)
+        {
+            fontSize = 18,
+            fontStyle = FontStyle.Bold,
+            alignment = TextAnchor.MiddleCenter
+        };
+
     }
 
     /// <summary>
