@@ -94,6 +94,14 @@ public class SerialDeviceManagerEditor : Editor
 
 #if SUP_API_SET
     /// <summary>
+    /// Displays Settings that the user can change to define baudrate and timeout.
+    /// </summary>
+    private void SetSerialSettings()
+    {
+
+    }
+
+    /// <summary>
     /// Displays a button that on press updates currently connected devices.
     /// </summary>
     private void ConnectedDevicesButton()
