@@ -10,6 +10,9 @@ public class SerialDeviceManagerEditor : Editor
     private GUIStyle headerLabel;
     #endregion
 
+    private string baudRateInput = "9600";
+    private string timeoutInput = "10";
+
     private BuildTargetGroup buildTargetGroup;
     private SerialDeviceManager serialManager;
 
@@ -45,11 +48,11 @@ public class SerialDeviceManagerEditor : Editor
         stylesInitilised = true;
         headerLabel = new GUIStyle(GUI.skin.label)
         {
-            fontSize = 18,
+            fontSize = 16,
             fontStyle = FontStyle.Bold,
-            alignment = TextAnchor.MiddleCenter
+            alignment = TextAnchor.MiddleCenter,
+            margin = new RectOffset(0, 0, 10, 10)
         };
-
     }
 
     /// <summary>
@@ -122,7 +125,30 @@ public class SerialDeviceManagerEditor : Editor
     /// </summary>
     private void SetSerialSettings()
     {
+        GUILayout.BeginVertical();
+        GUI.backgroundColor = HexToColour("#FFFFFF");
+        GUILayout.Label("SERIAL PORT SETTINGS", headerLabel);
 
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("BAUDRATE: ");
+        baudRateInput = GUILayout.TextField(baudRateInput);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("TIMEOUT: ");
+        timeoutInput = GUILayout.TextField(timeoutInput);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Friendly Name: ");
+        GUILayout.TextField(serialManager.deviceChosen.FriendlyName);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("Port: ");
+        GUILayout.TextField(serialManager.deviceChosen.Port);
+        GUILayout.EndHorizontal();
+        GUILayout.EndVertical();
     }
 
     /// <summary>
