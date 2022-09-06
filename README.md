@@ -1,4 +1,4 @@
-# Unity Arduino Package
+# Serial Unity Package - SUP
 
 A Unity package to enable easy 2 way serial communication between the Unity Editor and Arduino based microcontrollers. 
 
