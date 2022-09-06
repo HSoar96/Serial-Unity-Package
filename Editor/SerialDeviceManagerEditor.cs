@@ -21,7 +21,7 @@ public class SerialDeviceManagerEditor : Editor
         // Display text and button to change the API level.
         SetAPILevel();
 
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
         // Display button to begin serial communication with selected device.
         ConnectedDevicesButton();
         DisplayDevices();
@@ -38,7 +38,7 @@ public class SerialDeviceManagerEditor : Editor
         // If it does tell the user everything is fine,
         // else provide a prompt and a button to alert them.
 
-        // Could use #if UNITY_ARDUINO_API_SET here but this will be easier
+        // Could use #if SUP_API_SET here but this will be easier
         // to read down the line and performance doesnt matter to much in editor scripts.
         if (PlayerSettings.GetApiCompatibilityLevel(buildTargetGroup) != ApiCompatibilityLevel.NET_4_6)
         {
@@ -56,7 +56,7 @@ public class SerialDeviceManagerEditor : Editor
                 // Directly changes the users API level in their project settings,
                 // because using anything other than .NET 4.X will not allow the use of System.IO.Ports
                 PlayerSettings.SetApiCompatibilityLevel(buildTargetGroup, ApiCompatibilityLevel.NET_4_6);
-                SetGlobalDefine("UNITY_ARDUINO_API_SET");
+                SetGlobalDefine("SUP_API_SET");
             }
             GUILayout.EndVertical();
         }
@@ -92,7 +92,7 @@ public class SerialDeviceManagerEditor : Editor
         PlayerSettings.SetScriptingDefineSymbolsForGroup(buildTargetGroup, currentDefines + ";" + define);
     }
 
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
     /// <summary>
     /// Displays a button that on press updates currently connected devices.
     /// </summary>

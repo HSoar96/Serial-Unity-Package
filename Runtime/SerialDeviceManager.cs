@@ -5,7 +5,7 @@ using Microsoft.Win32;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
 using System.IO.Ports;
 #endif
 
@@ -18,7 +18,7 @@ public class SerialDeviceManager : MonoBehaviour
     [HideInInspector]
     public List<Device> connectedDevices = new List<Device>();
 
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
     #region Serial Communication Variables
     private const int BAUD_RATE = 115200;
     private const int DATA_BITS = 8;
@@ -60,7 +60,7 @@ public class SerialDeviceManager : MonoBehaviour
     }
 #endif
 
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
     /// <summary>
     /// Gets every USB serial device and then tries to connect.
     /// </summary>

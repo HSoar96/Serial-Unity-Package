@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
 using System.IO.Ports;
 #endif
 
 public class SerialCommunicationManager : MonoBehaviour
 {
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
     private const char NEWLINE_CHAR = '\n';
     private SerialDeviceManager serialDeviceManager;
     private SerialPort port = null;
