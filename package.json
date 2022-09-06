@@ -1,13 +1,14 @@
 {
-  "name": "com.hsoar.unity-arduino",
+  "name": "com.hsoar.serial-unity-package",
   "version": "0.2.1",
-  "displayName": "Unity Arduino",
+  "displayName": "S.U.P. - Serial Unity Package",
   "description": "A barebones package designed to interface arduino based devices with unity.",
   "unity": "2020.3",
   "unityRelease": "25f1",
   "author": {
     "name": "Harry Soar",
-    "email": "hsoar96@gmail.com"
+    "email": "hsoar96@gmail.com",
+    "url": "https://github.com/HSoar96"
   },
   "samples": [
     {
