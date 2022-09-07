@@ -235,7 +235,7 @@ public class SerialDeviceManagerEditor : Editor
     /// <returns>A <c>Unity Color</c> that corrosponds to parsed Hex</returns>
     private Color HexToColour(string hex)
     {
-        if (!hex.Contains("#"))
+        if (!hex.StartsWith("#"))
         {
             hex = "#" + hex;
         }
