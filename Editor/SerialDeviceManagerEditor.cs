@@ -134,16 +134,20 @@ public class SerialDeviceManagerEditor : Editor
         {
             // TODO: Work out a neater way to produce.
             GUILayout.BeginVertical();
-            GUI.backgroundColor = crossRed;
             GUILayout.BeginHorizontal();
+            GUI.backgroundColor = crossRed;
+
             GUILayout.FlexibleSpace();
             GUILayout.Box(
                 "\n Unity Arduino manager requires API Compatibility level of 4.X.\n \n" +
                 "Please change this in your project settings or press the button below.\n", textBox);
             GUILayout.FlexibleSpace();
+
+            GUI.backgroundColor = Color.white;
             GUILayout.EndHorizontal();
 
             GUI.backgroundColor = tickGreen;
+
             if (GUILayout.Button("Change API Level to .NET 4.6"))
             {
                 // Directly changes the users API level in their project settings,
@@ -151,6 +155,7 @@ public class SerialDeviceManagerEditor : Editor
                 PlayerSettings.SetApiCompatibilityLevel(buildTargetGroup, ApiCompatibilityLevel.NET_4_6);
                 SetGlobalDefine("SUP_API_SET");
             }
+
             GUI.backgroundColor = Color.white;
             GUILayout.EndVertical();
         }
@@ -159,11 +164,13 @@ public class SerialDeviceManagerEditor : Editor
             GUILayout.BeginVertical();
             GUI.backgroundColor = tickGreen;
             GUILayout.BeginHorizontal();
+
             GUILayout.FlexibleSpace();
             GUILayout.Box(
                 "\nAPI compatibility level is set correctly to .NET 4.6\n\n" +
                 "Unity Arduino should work as expected.\n",textBox);
             GUILayout.FlexibleSpace();
+
             GUILayout.EndHorizontal();
             GUI.backgroundColor = Color.white;
             GUILayout.EndVertical();
@@ -196,6 +203,7 @@ public class SerialDeviceManagerEditor : Editor
     private void SetSerialSettings()
     {
         GUILayout.BeginVertical();
+
         GUILayout.Label("SERIAL PORT SETTINGS", headerLabel);
 
         GUILayout.BeginHorizontal();
@@ -207,6 +215,7 @@ public class SerialDeviceManagerEditor : Editor
         GUILayout.Label("Read Timeout: ");
         timeoutInput = GUILayout.TextField(timeoutInput);
         GUILayout.EndHorizontal();
+
         GUILayout.EndVertical();
     }
 
@@ -215,14 +224,16 @@ public class SerialDeviceManagerEditor : Editor
     /// </summary>
     private void ConnectedDevicesButton()
     {
-        GUILayout.BeginVertical();       
+        GUILayout.BeginVertical();  
         GUI.backgroundColor = HexToColour("#0078FF");
+
         // Gets connected ports converts them to a list of strings
         // and shows them in the inspector.
         if (GUILayout.Button("Get Currently Connected Devices"))
         {
             serialManager.GetConnectedDevices();
         }
+
         GUI.backgroundColor = Color.white;
         GUILayout.EndVertical();
     }
@@ -241,9 +252,11 @@ public class SerialDeviceManagerEditor : Editor
         {
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
-            GUILayout.TextArea(serialManager.connectedDevices[i].FriendlyName);
-            GUILayout.TextArea(serialManager.connectedDevices[i].Port);
+
+            GUILayout.TextField(serialManager.connectedDevices[i].FriendlyName);
+            GUILayout.TextField(serialManager.connectedDevices[i].Port);
             serialManager.connectedDevices[i].Chosen = GUILayout.Toggle(serialManager.connectedDevices[i].Chosen, "Use This Device");
+
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
