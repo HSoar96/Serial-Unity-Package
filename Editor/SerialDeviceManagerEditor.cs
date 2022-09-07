@@ -134,13 +134,16 @@ public class SerialDeviceManagerEditor : Editor
         {
             // TODO: Work out a neater way to produce.
             GUILayout.BeginVertical();
-            GUI.backgroundColor = Color.red;
-
-            GUILayout.TextArea(
+            GUI.backgroundColor = crossRed;
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.Box(
                 "\n Unity Arduino manager requires API Compatibility level of 4.X.\n \n" +
-                "Please change this in your project settings or press the button below.\n");
+                "Please change this in your project settings or press the button below.\n", textBox);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
 
-            GUI.backgroundColor = Color.green;
+            GUI.backgroundColor = tickGreen;
             if (GUILayout.Button("Change API Level to .NET 4.6"))
             {
                 // Directly changes the users API level in their project settings,
@@ -154,12 +157,14 @@ public class SerialDeviceManagerEditor : Editor
         else
         {
             GUILayout.BeginVertical();
-            GUI.backgroundColor = Color.green;
-
-            GUILayout.TextArea(
+            GUI.backgroundColor = tickGreen;
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.Box(
                 "\nAPI compatibility level is set correctly to .NET 4.6\n\n" +
-                "Unity Arduino should work as expected.\n");
-
+                "Unity Arduino should work as expected.\n",textBox);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
             GUI.backgroundColor = Color.white;
             GUILayout.EndVertical();
         }
