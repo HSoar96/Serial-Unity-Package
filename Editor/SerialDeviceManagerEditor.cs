@@ -163,16 +163,6 @@ public class SerialDeviceManagerEditor : Editor
         GUILayout.Label("Read Timeout: ");
         timeoutInput = GUILayout.TextField(timeoutInput);
         GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Friendly Name: ");
-        GUILayout.TextField(serialManager.deviceChosen.FriendlyName);
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        GUILayout.Label("Port: ");
-        GUILayout.TextField(serialManager.deviceChosen.Port);
-        GUILayout.EndHorizontal();
         GUILayout.EndVertical();
     }
 
