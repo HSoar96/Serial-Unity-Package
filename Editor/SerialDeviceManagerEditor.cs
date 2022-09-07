@@ -9,8 +9,12 @@ public class SerialDeviceManagerEditor : Editor
 {
     #region Styles
     private bool stylesInitilised = false;
-    private GUIStyle headerLabel;
-    private GUIStyle textBox;
+    private GUIStyle headerLabel = null;
+    private GUIStyle textBox = null;
+
+    private Color tickGreen;
+    private Color crossRed;
+    private Color darkGrey;
     #endregion
 
 #if SUP_API_SET
@@ -70,13 +74,48 @@ public class SerialDeviceManagerEditor : Editor
     /// </summary>
     void InitiliseStyles()
     {
+        tickGreen = HexToColour("#00731f");
+        crossRed = HexToColour("#730000");
+        darkGrey = HexToColour("#191919");
+
         stylesInitilised = true;
+
         headerLabel = new GUIStyle(GUI.skin.label)
         {
             fontStyle = FontStyle.Bold,
             alignment = TextAnchor.MiddleCenter,
             margin = new RectOffset(0, 0, 10, 10)
         };
+
+        textBox = new GUIStyle(GUI.skin.box)
+        {
+            alignment = TextAnchor.MiddleCenter
+        };
+
+        // Sets the background texture image to pure white,
+        // if its kept defualt all colours are washed out.
+        Texture2D whiteTex = MakeTex(1, 1, Color.white);
+        textBox.normal.background = whiteTex;
+    }
+
+    /// <summary>
+    /// Makes a texture of a specified color.
+    /// </summary>
+    /// <param name="width">Width of the texture in pixels.</param>
+    /// <param name="height">Height of the texture in pixels.</param>
+    /// <param name="col">Color of the texture.</param>
+    /// <returns>A texture of the specified width height and color.</returns>
+    private Texture2D MakeTex(int width, int height, Color col)
+    {
+        Color[] pix = new Color[width * height];
+        for (int i = 0; i < pix.Length; ++i)
+        {
+            pix[i] = col;
+        }
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pix);
+        result.Apply();
+        return result;
     }
 
     /// <summary>
