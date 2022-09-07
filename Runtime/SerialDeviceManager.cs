@@ -14,18 +14,19 @@ public class SerialDeviceManager : MonoBehaviour
     [HideInInspector]
     public Device deviceChosen = null;
     private Device deviceToUse = null;
-    [SerializeField]
     [HideInInspector]
     public List<Device> connectedDevices = new List<Device>();
 
 #if SUP_API_SET
     #region Serial Communication Variables
-    private const int BAUD_RATE = 115200;
     private const int DATA_BITS = 8;
     // Timeout is in miliseconds, 1ms response time equates to 
     // 1 frame at 1000fps meaning it shouldnt cause any meaningful delay
     // to the program.
-    private const int READ_TIMEOUT = 10;
+    [HideInInspector]
+    public int readTimeout = 10;
+    [HideInInspector]
+    public int baudRate = 115200;
     public SerialPort serialPort = null;
     #endregion
 
@@ -139,12 +140,12 @@ public class SerialDeviceManager : MonoBehaviour
 
         SerialPort port = new SerialPort(portID);
 
-        port.BaudRate = BAUD_RATE;
+        port.BaudRate = baudRate;
         port.Parity = Parity.None;
         port.StopBits = StopBits.One;
         port.DataBits = DATA_BITS;
         port.Handshake = Handshake.None;
-        port.ReadTimeout = READ_TIMEOUT;
+        port.ReadTimeout = readTimeout;
 
         return port;
     }

@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEditor;
+using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 [CustomEditor(typeof(SerialDeviceManager)),CanEditMultipleObjects]
@@ -8,6 +10,7 @@ public class SerialDeviceManagerEditor : Editor
     #region Styles
     private bool stylesInitilised = false;
     private GUIStyle headerLabel;
+    private GUIStyle textBox;
     #endregion
 
     private string baudRateInput = "9600";
@@ -34,10 +37,29 @@ public class SerialDeviceManagerEditor : Editor
         SetAPILevel();
 
 #if SUP_API_SET
+        SetSerialSettings();
         // Display button to begin serial communication with selected device.
         ConnectedDevicesButton();
         DisplayDevices();
 #endif
+
+        // TODO: There must be a better way to do this.
+        // When the user updates the UI in any way update the manager variables.
+        if (GUI.changed)
+        {
+            // Allows only int values replace non numerical chars with nothing.
+            baudRateInput = Regex.Replace(baudRateInput, @"[^0-9]", "");
+            timeoutInput = Regex.Replace(timeoutInput, @"[^0-9]", "");
+
+            if (string.IsNullOrEmpty(baudRateInput))
+                baudRateInput = "0";
+
+            if(string.IsNullOrEmpty(timeoutInput))
+                timeoutInput = "0";
+
+            serialManager.baudRate = int.Parse(baudRateInput);
+            serialManager.readTimeout = int.Parse(timeoutInput);
+        }
     }
 
     /// <summary>
@@ -130,12 +152,12 @@ public class SerialDeviceManagerEditor : Editor
         GUILayout.Label("SERIAL PORT SETTINGS", headerLabel);
 
         GUILayout.BeginHorizontal();
-        GUILayout.Label("BAUDRATE: ");
+        GUILayout.Label("Baudrate: ");
         baudRateInput = GUILayout.TextField(baudRateInput);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        GUILayout.Label("TIMEOUT: ");
+        GUILayout.Label("Read Timeout: ");
         timeoutInput = GUILayout.TextField(timeoutInput);
         GUILayout.EndHorizontal();
 
