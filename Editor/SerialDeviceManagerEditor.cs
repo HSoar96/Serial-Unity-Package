@@ -73,7 +73,6 @@ public class SerialDeviceManagerEditor : Editor
         stylesInitilised = true;
         headerLabel = new GUIStyle(GUI.skin.label)
         {
-            fontSize = 16,
             fontStyle = FontStyle.Bold,
             alignment = TextAnchor.MiddleCenter,
             margin = new RectOffset(0, 0, 10, 10)
