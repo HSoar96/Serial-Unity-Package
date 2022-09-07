@@ -109,6 +109,7 @@ public class SerialDeviceManagerEditor : Editor
                 PlayerSettings.SetApiCompatibilityLevel(buildTargetGroup, ApiCompatibilityLevel.NET_4_6);
                 SetGlobalDefine("SUP_API_SET");
             }
+            GUI.backgroundColor = Color.white;
             GUILayout.EndVertical();
         }
         else
@@ -120,6 +121,7 @@ public class SerialDeviceManagerEditor : Editor
                 "\nAPI compatibility level is set correctly to .NET 4.6\n\n" +
                 "Unity Arduino should work as expected.\n");
 
+            GUI.backgroundColor = Color.white;
             GUILayout.EndVertical();
         }
     }
@@ -150,7 +152,6 @@ public class SerialDeviceManagerEditor : Editor
     private void SetSerialSettings()
     {
         GUILayout.BeginVertical();
-        GUI.backgroundColor = HexToColour("#FFFFFF");
         GUILayout.Label("SERIAL PORT SETTINGS", headerLabel);
 
         GUILayout.BeginHorizontal();
@@ -170,14 +171,15 @@ public class SerialDeviceManagerEditor : Editor
     /// </summary>
     private void ConnectedDevicesButton()
     {
-        GUI.backgroundColor = HexToColour("#0078FF");
         GUILayout.BeginVertical();       
+        GUI.backgroundColor = HexToColour("#0078FF");
         // Gets connected ports converts them to a list of strings
         // and shows them in the inspector.
         if (GUILayout.Button("Get Currently Connected Devices"))
         {
             serialManager.GetConnectedDevices();
         }
+        GUI.backgroundColor = Color.white;
         GUILayout.EndVertical();
     }
 
