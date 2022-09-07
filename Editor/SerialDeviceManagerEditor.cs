@@ -13,8 +13,11 @@ public class SerialDeviceManagerEditor : Editor
     private GUIStyle textBox;
     #endregion
 
+#if SUP_API_SET
+    // This #if is to prevent CS0168 warnings in unity/ide. 
     private string baudRateInput = "9600";
     private string timeoutInput = "10";
+#endif
 
     private BuildTargetGroup buildTargetGroup;
     private SerialDeviceManager serialManager;
@@ -41,7 +44,6 @@ public class SerialDeviceManagerEditor : Editor
         // Display button to begin serial communication with selected device.
         ConnectedDevicesButton();
         DisplayDevices();
-#endif
 
         // TODO: There must be a better way to do this.
         // When the user updates the UI in any way update the manager variables.
@@ -60,6 +62,7 @@ public class SerialDeviceManagerEditor : Editor
             serialManager.baudRate = int.Parse(baudRateInput);
             serialManager.readTimeout = int.Parse(timeoutInput);
         }
+#endif
     }
 
     /// <summary>
