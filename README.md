@@ -35,7 +35,7 @@ It is important to set the correct baudrate and timeout, the default baudrate is
 
 You can change the baudrate and timeout to whatever you prefer however you must do it both in your arduino code and in your unity project via your Serial Manager.
 
-```
+```cpp
 void setup() 
 {
   	Serial.begin(115200);
@@ -45,7 +45,7 @@ void setup()
 
 #### Runtime
 Below is some basic example code for the arduino followed by a corrosponding script for unity, this turns on and off the bultin LED when W or S are pressed at runtime in unity. It also sends data to unity and displays it in the debug log when pin D4 is high. 
-```
+```cpp
 void loop() 
 {
   	String s = Serial.readStringUntil('\n');
@@ -65,7 +65,7 @@ void loop()
 }
 ```
 
-```
+```c#
     public SerialCommunicationManager communicationManager;
 
     private void Update()
