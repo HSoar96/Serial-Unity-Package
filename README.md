@@ -103,4 +103,4 @@ The samples have currently been tested on the following devices.
 - NodeMCU V3
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](https://github.com/HSoar96/Serial-Unity-Package/main/LICENSE.md)
