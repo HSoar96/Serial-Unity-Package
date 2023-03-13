@@ -8,7 +8,7 @@ public class LEDChanger : MonoBehaviour
 
     private void Update()
     {
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
         if (Input.GetKeyDown(KeyCode.W))
             communicationManager.SerialWriteLine("LED ON");
 

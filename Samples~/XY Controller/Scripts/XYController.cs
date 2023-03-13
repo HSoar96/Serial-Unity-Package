@@ -13,7 +13,7 @@ public class XYController : MonoBehaviour
 
     void Update()
     {
-#if UNITY_ARDUINO_API_SET
+#if SUP_API_SET
         string[] serialData = commManager.ReadPinData(' ');
 
         if(serialData != null)
