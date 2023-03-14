@@ -6,7 +6,7 @@ This package only works on Windows however Unix compatibility is in the works.
 
 ## Installation
 
-Use [Unity Package Manager](https://docs.unity3d.com/Manual/upm-ui.html) to add Unity Arduino Package to your project. You can either do this via the GIT URL option or via disk.
+Use [Unity Package Manager](https://docs.unity3d.com/Manual/upm-ui.html) to add Serial Unity Package to your project. You can either do this via the GIT URL option or via disk.
 
 ## Usage
 ### Unity
