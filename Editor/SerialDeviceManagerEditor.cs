@@ -28,7 +28,7 @@ public class SerialDeviceManagerEditor : Editor
 #endif
     }
 
-    /// <summary>
+        /// <summary>
     /// Creates UI elements that check API level 
     /// and allow the user to press a button to change it if required.
     /// </summary>
@@ -38,10 +38,7 @@ public class SerialDeviceManagerEditor : Editor
         // If it does tell the user everything is fine,
         // else provide a prompt and a button to alert them.
 
-        // Could use #if SUP_API_SET here but this will be easier
-        // to read down the line and performance doesnt matter to much in editor scripts.
-        if (PlayerSettings.GetApiCompatibilityLevel(buildTargetGroup) != ApiCompatibilityLevel.NET_4_6)
-        {
+        #if !SUP_API_SET
             // TODO: Work out a neater way to produce.
             GUILayout.BeginVertical();
             GUI.backgroundColor = Color.red;
@@ -59,9 +56,9 @@ public class SerialDeviceManagerEditor : Editor
                 SetGlobalDefine("SUP_API_SET");
             }
             GUILayout.EndVertical();
-        }
-        else
-        {
+        #endif
+
+        #if SUP_API_SET
             GUILayout.BeginVertical();
             GUI.backgroundColor = Color.green;
 
@@ -70,7 +67,7 @@ public class SerialDeviceManagerEditor : Editor
                 "Unity Arduino should work as expected.\n");
 
             GUILayout.EndVertical();
-        }
+        #endif
     }
 
     /// <summary>
