@@ -25,6 +25,11 @@
       "displayName": "XY Controller",
       "description": "A scene containing a Serial Manager, a XY Controller script that uses two potentiometers to control a cube on screen. As well as the corrosponding Arduino .INO and .CPP files.",
       "path": "Samples~/XY Controller"
+    },
+    {
+      "displayName": "JSON Handler",
+      "description": "A scene containing a Serial Manager, and a JSONHandler object that sends a mapped mouse position to an arduino and awaits a response. As well as corrosponding Arduino .INO and PlatformIO .cpp files.",
+      "path": "Samples~/JSON Handler"
     }
   ]
 }
