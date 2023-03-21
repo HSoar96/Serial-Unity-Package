@@ -137,11 +137,11 @@ public class SerialDeviceManagerEditor : Editor
                         serialManager.connectedDevices[j].Chosen = false;
                     }
                 }
-                serialManager.deviceChosen = serialManager.connectedDevices[i];
+                serialManager.SetDeviceChosen(serialManager.connectedDevices[i]);
             }
         }
         if (!deviceChosen)
-            serialManager.deviceChosen = null;
+            serialManager.SetDeviceChosen(null);
     }
 #endif
 

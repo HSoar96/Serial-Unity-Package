@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEditor;
 
 #if SUP_API_SET
 using System.IO.Ports;
@@ -43,6 +44,7 @@ public class SerialDeviceManager : MonoBehaviour
 
     private void Awake()
     {
+        EditorJsonUtility.FromJsonOverwrite(EditorPrefs.GetString(GetDeviceChosen()), this);
         SceneManager.sceneUnloaded += OnSceneUnloaded;
         BeginSerialCommuniation();
     }
@@ -59,6 +61,16 @@ public class SerialDeviceManager : MonoBehaviour
         }
     }
 #endif
+
+    private string GetDeviceChosen()
+    {
+        return deviceChosen + GetInstanceID().ToString();
+    }
+
+    public void SetDeviceChosen(Device chosenDevice) {
+        deviceChosen = chosenDevice;
+        EditorPrefs.SetString(GetDeviceChosen(), EditorJsonUtility.ToJson(this));
+    }
 
 #if SUP_API_SET
     /// <summary>
@@ -99,6 +111,7 @@ public class SerialDeviceManager : MonoBehaviour
     /// <exception cref="NullReferenceException"></exception>
     private void BeginSerialCommuniation()
     {
+
         UpdateDeviceToUse(deviceChosen);
 
         if (deviceToUse == null)
@@ -134,8 +147,10 @@ public class SerialDeviceManager : MonoBehaviour
     /// <exception cref="Exception"></exception>
     private SerialPort SetupSerialPort(string portID)
     {
+#if UNITY_EDITOR_WIN
         if (!portID.StartsWith("COM"))
             throw new Exception("Port ID must begin with COM");
+#endif
 
         SerialPort port = new SerialPort(portID);
 
@@ -160,6 +175,7 @@ public class SerialDeviceManager : MonoBehaviour
         if (chosenDevice == null)
             throw new Exception("Device cannot be null");
 
+#if UNITY_EDITOR_WIN
         // This is platform dependant and only works on windows.
         // It will format the string and initialise a new string list for comports.
         string pattern = string.Format("^VID_{0}.PID_{1}", chosenDevice.VID, chosenDevice.PID);
@@ -206,6 +222,16 @@ public class SerialDeviceManager : MonoBehaviour
                 }
             }
         }
+#endif
+
+#if UNITY_EDITOR_OSX
+        foreach (String portName in SerialPort.GetPortNames())
+        {
+            String[] hardwareInfo = { "NULL_NULL_NULL_NULL_NULL" };
+            if (portName.Equals(chosenDevice.Port))
+                deviceToUse = new Device(portName, portName, hardwareInfo);
+        }
+#endif
     }
 
     /// <summary>
@@ -217,6 +243,7 @@ public class SerialDeviceManager : MonoBehaviour
     {
         var devices = new List<Device>();
 
+#if UNITY_EDITOR_WIN
         // Get to the base location of the registry where HID data is stored.
         RegistryKey rk1 = Registry.LocalMachine;
         RegistryKey rk2 = rk1.OpenSubKey("SYSTEM\\CurrentControlSet\\Enum");
@@ -267,9 +294,20 @@ public class SerialDeviceManager : MonoBehaviour
                 }
             }
         }
-        return devices;
-    }
 #endif
 
+#if UNITY_EDITOR_OSX
+        foreach (String portName in SerialPort.GetPortNames())
+        {
+            // Example: /dev/tty.usbmodem1101
+            String[] hardwareInfo = {"NULL_NULL_NULL_NULL_NULL"};
+            Match m = Regex.Match(portName, "/dev/tty.usb*");
+            if (m.Success)
+                devices.Add(new Device(portName, portName, hardwareInfo));
+        }
+#endif
+        return devices;
+    }
 
+#endif
 }
