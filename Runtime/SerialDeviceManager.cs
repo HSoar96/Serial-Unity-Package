@@ -14,7 +14,6 @@ public class SerialDeviceManager : MonoBehaviour
     [HideInInspector]
     public Device deviceChosen = null;
     private Device deviceToUse = null;
-    [SerializeField]
     [HideInInspector]
     public List<Device> connectedDevices = new List<Device>();
 
@@ -22,9 +21,6 @@ public class SerialDeviceManager : MonoBehaviour
     #region Serial Communication Variables
     private const int BAUD_RATE = 115200;
     private const int DATA_BITS = 8;
-    // Timeout is in miliseconds, 1ms response time equates to 
-    // 1 frame at 1000fps meaning it shouldnt cause any meaningful delay
-    // to the program.
     private const int READ_TIMEOUT = 10;
     public SerialPort serialPort = null;
     #endregion
@@ -67,22 +63,26 @@ public class SerialDeviceManager : MonoBehaviour
     /// <returns>A list of currently connected devices</returns>
     public void GetConnectedDevices()
     {
-        connectedDevices.Clear();
-        var allDevices = GetAllComDevices();
-        foreach (Device device in allDevices)
+        connectedDevices = PollDevices(GetAllComDevices());
+    }
+
+    private List<Device> PollDevices(List<Device> devicesToPoll)
+    {
+        var liveDevices = new List<Device>();
+
+        foreach (Device device in devicesToPoll)
         {
             SerialPort port = new SerialPort(device.Port);
             try
             {
                 // If it opens immediatly close,
-                // log it and add to dictionary.
+                // log it and add to list.
                 if (!port.IsOpen)
                 {
                     port.Open();
                 }
                 port.Close();
-
-                connectedDevices.Add(device);
+                liveDevices.Add(device);
             }
             catch (Exception e)
             {
@@ -90,6 +90,8 @@ public class SerialDeviceManager : MonoBehaviour
             }
 
         }
+
+        return liveDevices;
     }
 
     /// <summary>
@@ -99,6 +101,9 @@ public class SerialDeviceManager : MonoBehaviour
     /// <exception cref="NullReferenceException"></exception>
     private void BeginSerialCommuniation()
     {
+        // The device needs to be updated to ensure compatablity between machines.
+        // This ensures that wherever the user plugs in the desired serial port
+        // it will work including in builds. 
         UpdateDeviceToUse(deviceChosen);
 
         if (deviceToUse == null)
@@ -111,7 +116,7 @@ public class SerialDeviceManager : MonoBehaviour
             // This will not change unless the registry is cleared, meaning even if the device
             // is not plugged in it will be there, therefore the program will try and connect
             // to a currently unplugged board. 
-            //TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
+            // TODO: Look into https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialport.pinchanged
             // and https://docs.microsoft.com/en-us/dotnet/api/system.io.ports.serialpinchange (DsrChanged)
             // to see if this can help determine if a device is currently connected before trying to open communication.
             try
@@ -199,8 +204,24 @@ public class SerialDeviceManager : MonoBehaviour
                         // Create a new device that will be the first device with that VID and PID found.
                         if (!string.IsNullOrEmpty(portName))
                         {
-                            deviceToUse = new Device(portName, friendlyName, hardwareInfo);
-                            return;
+                            // TODO: Clean this up.
+                            Device d = new Device(portName, friendlyName, hardwareInfo);
+                            SerialPort port = new SerialPort(d.Port);
+                            try
+                            {
+                                // If it opens immediatly close,
+                                // set that as device to use and return.
+                                if (!port.IsOpen)
+                                {
+                                    port.Open();
+                                }
+                                port.Close();
+                                deviceToUse = d;
+                                return;
+                            }
+                            catch (Exception e)
+                            {
+                            }
                         }
                     }
                 }
