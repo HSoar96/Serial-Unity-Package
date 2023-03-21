@@ -1,6 +1,6 @@
 {
   "name": "com.hsoar.serial-unity-package",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "displayName": "S.U.P. - Serial Unity Package",
   "description": "A barebones package designed to interface arduino based devices with unity.",
   "unity": "2020.3",
