@@ -12,7 +12,7 @@ Use [Unity Package Manager](https://docs.unity3d.com/Manual/upm-ui.html) to add 
 ### Unity
 Create a Serial Manager by placing ```SerialDeviceManager.cs``` and ```SerialCommunicationManager.cs```on an empty ```GameObject```, or import and use the sample manager.
 
-Select your new manager in the heirachy and follow the prompts to update your API Compatibility level. This is required to use the ```System.IO.Ports``` namespace.
+Select your new manager in the hierarchy and follow the prompts to update your API Compatibility level. This is required to use the ```System.IO.Ports``` namespace.
 
 There are 3 public Methods in  ```SerialCommunicationManager.cs``` that you can use to communicate to your serial device.
 
@@ -21,9 +21,9 @@ Sends a message over the chosen serial port followed by the chosen newline chara
 #### SerialWrite
 Sends a message over the chosen serial port.
 #### SerialReadLine 
-Reads incomming data from the serial port up until the chosen new line character or until it times out.
+Reads incoming data from the serial port up until the chosen new line character or until it times out.
 #### ReadPinData
-Reads incomming data from the serial port and then splits it using the defined delimiter. Returning an array of strings.  It is reccomended to use this to recieve data from specific pins. This becomes useful when sending data from lots of pins and allows for easy comparisons.
+Reads incoming data from the serial port and then splits it using the defined delimiter. Returning an array of strings.  It is recommended to use this to receive data from specific pins. This becomes useful when sending data from lots of pins and allows for easy comparisons.
 
 ### Arduino
 If required by your specific device e.g. Teensy's set the operation mode to Serial.
@@ -44,7 +44,7 @@ void setup()
 ```
 
 #### Runtime
-Below is some basic example code for the arduino followed by a corrosponding script for unity, this turns on and off the bultin LED when W or S are pressed at runtime in unity. It also sends data to unity and displays it in the debug log when pin D4 is high. 
+Below is some basic example code for the arduino followed by a corresponding script for unity, this turns on and off the built-in LED when W or S are pressed at runtime in unity. It also sends data to unity and displays it in the debug log when pin D4 is high. 
 ```cpp
 void loop() 
 {
@@ -84,17 +84,23 @@ void loop()
 ## Samples
 There are currently three samples that can be imported through the Unity Package Manager.
 
-- A sample Serial Manager Prefab
-- An Onboard LED Changer
-- A simple XY Controller
+- Sample Serial Manager Prefab
+- Builtin LED Changer
+- Simple XY Controller
+- Simple JSON Parser and Generator
 
-The sample serial manager prefab contains only the serial manager and no scene.
+#### Serial Manager Prefab
+The sample serial manager prefab contains only the serial manager and no scene.<br>
+***IMPORTANT: When choosing your device ensure you do it in the prefab not in the object in the hierarchy because this will be reset on play***
 
-The LED Changer and XY Controller include both a functioning unity scene and example arduino scripts in both a ```.cpp``` and ```.ino``` format.
+#### LED Changer
+The LED Changer turns on/off the arduino’s built-in LED when W/S is pressed at runtime in the unity scene. Including both a unity scene and example arduino scripts in both ```.cpp`` and ```.ino```
 
-The LED Changer turns on the arduinos built in LED when W or S is pressed at runtime in the unity scene.
+#### XY Controller
+The XY Controller includes both a functioning unity scene and example arduino scripts in both a ```.cpp``` and ```.ino``` format.
 
-The XY Controller uses two potentiometers to move a GameObject in the X and Y directions
+#### JSON Parser/Generator
+A scene containing a Serial Manager, and a JSONHandler object that sends a mapped mouse position to an arduino and awaits a response. As well as corresponding PlatformIO ```.cpp```  and Arduino ```.ino``` files.
 
 The samples have currently been tested on the following devices.
 
